@@ -1,0 +1,11 @@
+# Local project tracker — contains private Google Slides URLs and session notes
+CLAUDE.md
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# OS
+.DS_Store
+Thumbs.db
