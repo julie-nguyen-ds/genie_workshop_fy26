@@ -99,6 +99,44 @@ print(f"warehouse_id: {warehouse_id}")
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC ## Load the 6 starter benchmark questions for Exercise 1
+# MAGIC
+# MAGIC Reads `exercises/01_benchmarks/benchmark_questions.csv` (sits next to this
+# MAGIC notebook in workspace files) and builds the `benchmarks.questions` block
+# MAGIC that we'll inline into the `serialized_space` JSON below — so the space
+# MAGIC ships with the benchmark already populated, no post-creation API call.
+
+# COMMAND ----------
+
+import os, csv
+
+notebook_path = ctx.notebookPath().get()
+csv_path = os.path.normpath(
+    f"/Workspace{os.path.dirname(notebook_path)}/../exercises/01_benchmarks/benchmark_questions.csv"
+)
+
+with open(csv_path, encoding="utf-8") as f:
+    benchmark_rows = list(csv.DictReader(f))
+
+benchmark_questions = [
+    {
+        "id": f"{50 + i:032d}",
+        "question": [row["question"]],
+        "answer": [
+            {
+                "format": "SQL",
+                "content": [row["expected_sql"]],
+            }
+        ],
+    }
+    for i, row in enumerate(benchmark_rows)
+]
+
+print(f"Loaded {len(benchmark_questions)} benchmark questions from {csv_path}")
+
+# COMMAND ----------
+
 serialized_space = json.dumps({
     "version": 2,
     "config": {
@@ -129,6 +167,9 @@ serialized_space = json.dumps({
         "join_specs": [],
         "sql_snippets": {"filters": [], "expressions": [], "measures": []},
     },
+    "benchmarks": {
+        "questions": benchmark_questions,
+    },
 })
 
 # COMMAND ----------
@@ -147,64 +188,9 @@ result = api("POST", "/api/2.0/genie/spaces", {
 })
 
 space_id = result.get("space_id") or result.get("id")
-print(f"space_id: {space_id}")
-print(f"open:     {HOST.rstrip('/')}/genie/rooms/{space_id}")
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC ## Load the 6 starter benchmark questions for Exercise 1
-# MAGIC
-# MAGIC Reads `exercises/01_benchmarks/benchmark_questions.csv` (sits next to this
-# MAGIC repo in workspace files) and tries to attach the questions to the space's
-# MAGIC benchmark. If the Genie benchmark API isn't available on this workspace,
-# MAGIC the questions are printed below for the facilitator to add manually via
-# MAGIC the Benchmark tab UI.
-
-# COMMAND ----------
-
-import os, csv
-
-notebook_path = ctx.notebookPath().get()
-csv_path = os.path.normpath(
-    f"/Workspace{os.path.dirname(notebook_path)}/../exercises/01_benchmarks/benchmark_questions.csv"
-)
-
-with open(csv_path, encoding="utf-8") as f:
-    benchmark_rows = list(csv.DictReader(f))
-
-print(f"Loaded {len(benchmark_rows)} benchmark questions from {csv_path}")
-
-added = 0
-failed_rows = []
-for i, row in enumerate(benchmark_rows, start=30):
-    body = {
-        "id": f"{i:032d}",
-        "question": [row["question"]],
-        "expected_sql": [row["expected_sql"]],
-    }
-    try:
-        api("POST", f"/api/2.0/genie/spaces/{space_id}/benchmark-questions", body)
-        added += 1
-        print(f"  added: {row['question'][:70]}")
-    except RuntimeError as e:
-        failed_rows.append(row)
-
-if added == len(benchmark_rows):
-    print(f"\nAll {added} benchmark questions added programmatically.")
-elif added == 0:
-    print("\nNo benchmark questions could be added programmatically — the API may")
-    print("not expose benchmark management yet on this workspace. Add them manually")
-    print("in the Genie space → Benchmark tab → Add question:")
-    for row in failed_rows:
-        print(f"\n  Q: {row['question']}")
-        print(f"  SQL: {row['expected_sql']}")
-else:
-    print(f"\nPartial success: {added}/{len(benchmark_rows)} added programmatically.")
-    print("Add the remainder manually in the Benchmark tab:")
-    for row in failed_rows:
-        print(f"\n  Q: {row['question']}")
-        print(f"  SQL: {row['expected_sql']}")
+print(f"space_id:        {space_id}")
+print(f"benchmarks:      {len(benchmark_questions)} question(s) baked in")
+print(f"open:            {HOST.rstrip('/')}/genie/rooms/{space_id}")
 
 # COMMAND ----------
 

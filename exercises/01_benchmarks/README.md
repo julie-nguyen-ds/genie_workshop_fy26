@@ -16,7 +16,7 @@ Two important properties:
 ## Prerequisites
 - The base Genie space from setup (6 benchmark questions pre-loaded by `setup/01_create_base_space.py`).
 
-> Note on the loader: Databricks Genie doesn't yet support a CSV import of benchmarks in the UI. The setup notebook attempts to load the 6 questions programmatically; if your workspace's API doesn't accept benchmark writes, setup prints the questions and the facilitator pastes them in via **Benchmark tab → Add question** before the session. The source-of-truth list lives in `benchmark_questions.csv`.
+> Note on the loader: Databricks Genie doesn't yet have a CSV import for benchmarks in the UI. The setup notebook bakes the 6 questions directly into the space's `serialized_space.benchmarks.questions` block at creation time — so they're already there when you open the Benchmark tab. The source-of-truth list lives in `benchmark_questions.csv`; if you need to re-seed, re-run `setup/01_create_base_space.py` and it creates a fresh space with benchmarks pre-loaded.
 
 ---
 
