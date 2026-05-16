@@ -4,7 +4,7 @@ This is the deep-dive cheat sheet for the live walk-through portion of Exercise 
 
 **Reminder:** Ex 1 does not tune anything. The point is to **see the baseline** and look at each failure long enough to understand what kind of fix it needs — then come back to it in the appropriate later exercise.
 
-## The 6 starter benchmark questions and where each one gets fixed
+## The 5 starter benchmark questions and where each one gets fixed
 
 | # | Question | Why it might fail | Where we fix it |
 |---|---|---|---|
@@ -13,9 +13,10 @@ This is the deep-dive cheat sheet for the live walk-through portion of Exercise 
 | 3 | Total claim amount by loss type, motor only, 2025 | Similar — `product_line = 'Motor'` case mismatch; sometimes wrong date column | **Ex 2** Entity matching (and good sample values discipline in Ex 4) |
 | 4 | **Which branch has the most active in-force policies right now?** | Genie reads "active" as `status = 'active'` only — ignores the date window. "In-force" is insurance jargon Genie doesn't know. | **Ex 4** — atomic text instruction defining `in-force = status='active' AND effective_date <= current_date() AND expiry_date >= current_date()` |
 | 5 | **Top 10 agents by claim count + branch** | `claims` table has no `agent_id` — the join must traverse `claims → policies → agents`. Genie often errors or invents a wrong path. | **Ex 5** — parameterised example SQL pinning the canonical 4-way join |
-| 6 | **Show me total paid claims by loss type for 2025** | Without a trusted asset, Genie picks `report_date`/`settle_date`, omits the `status='paid'` filter, or renames columns each run | **Ex 5** — UC SQL function `claims_by_loss_type(start_date, end_date)` returns `loss_type`, `claim_count`, `total_paid_thb` deterministically |
 
-3 easy/moderate to set the baseline (#1-3), 3 engineered failures previewing different fixes (#4-6). Attendees add a 7th of their own in Part B.
+3 easy/moderate to set the baseline (#1-3) + 2 engineered failures previewing different fixes (#4-5).
+
+**Attendees add a 6th question themselves in Part B** — and that 6th is mandated, not free choice: *"Show me total paid claims by loss type for 2025"*. This is the natural-language counterpart for the UC SQL function (`claims_by_loss_type`) attendees will build in Ex 5. Adding it here closes the loop: Ex 5's function pins the SQL, the benchmark then passes consistently on re-run.
 
 ## What each later exercise fixes (live re-run guidance)
 
@@ -23,42 +24,67 @@ After each later exercise, you *could* re-run the benchmark to demonstrate the s
 
 - After **Ex 2** (Entity matching ON): #1, #2, #3 should pass — case mismatch fixed.
 - After **Ex 4** (in-force instruction added): #4 should pass.
-- After **Ex 5** (trusted assets added): #5 and #6 should pass.
+- After **Ex 5** (trusted assets added): #5 should pass, and the **user-added 6th question** ("total paid claims by loss type for 2025") should also pass since the new UC function pins its SQL.
 
 If a question still fails after the "right" exercise, it's a coaching moment: dig into the generated SQL and figure out the residual gap.
 
-## Coaching the "add your own benchmark" step (Part B)
+## Coaching the "add the 6th benchmark" step (Part B)
 
-Suggested question for attendees: *"What's our average paid claim amount for property fire losses in 2025?"*
+The question is mandated: *"Show me total paid claims by loss type for 2025."*
 
-**What you'll likely see Genie generate (varies by whether Entity matching is on yet — it isn't, in Ex 1):**
+**What Genie will likely generate (Entity matching is OFF in Ex 1):**
 
+Common variants you'll see:
 ```sql
-SELECT AVG(cl.claim_amount_thb) AS avg_paid_thb
-FROM workspace.insurance_data.claims cl
-JOIN workspace.insurance_data.policies p ON p.policy_id = cl.policy_id
-WHERE p.product_subtype = 'property_fire'
-  AND cl.status = 'paid'
-  AND YEAR(cl.settle_date) = 2025;
+-- Variant A — wrong date column, wrong status case
+SELECT loss_type, SUM(claim_amount_thb) AS total
+FROM workspace.insurance_data.claims
+WHERE status = 'Paid' AND YEAR(settle_date) = 2025
+GROUP BY loss_type;
+```
+```sql
+-- Variant B — no status filter at all
+SELECT loss_type, SUM(claim_amount_thb)
+FROM workspace.insurance_data.claims
+WHERE YEAR(loss_date) = 2025
+GROUP BY loss_type;
+```
+```sql
+-- Variant C — right idea, drifting column names
+SELECT loss_type, COUNT(*) AS num_claims, SUM(claim_amount_thb) AS sum_amount
+FROM workspace.insurance_data.claims
+WHERE status = 'paid' AND loss_date BETWEEN '2025-01-01' AND '2025-12-31'
+GROUP BY loss_type;
 ```
 
-…but Genie might generate `'Property_fire'` or `'Paid'` (uppercase) since Entity matching is OFF in Ex 1. **That's the point**: attendees see the raw failure mode and learn to verify the SQL themselves.
+The "verified expected SQL" we want attendees to land on:
+```sql
+SELECT
+  loss_type,
+  COUNT(*) AS claim_count,
+  COALESCE(SUM(CASE WHEN status = 'paid' THEN claim_amount_thb END), 0) AS total_paid_thb
+FROM workspace.insurance_data.claims
+WHERE loss_date BETWEEN DATE'2025-01-01' AND DATE'2025-12-31'
+GROUP BY loss_type
+ORDER BY claim_count DESC;
+```
 
-**Things attendees should check (your coaching prompts):**
+**Coaching prompts to walk attendees through:**
 
-1. **Case** — is `'paid'` actually `'paid'` in the column? Run `SELECT DISTINCT status FROM workspace.insurance_data.claims`. (Genie WILL likely get this wrong in Ex 1.)
-2. **Date column** — `YEAR(cl.settle_date) = 2025` or `YEAR(cl.loss_date) = 2025`? Both are defensible; the *insurance* convention is `loss_date` for occurrence-year reporting, `settle_date` for paid-in-year cash reporting. Ask attendees: *which would the business expect?*
-3. **Population filter** — `product_subtype = 'property_fire'` matches the actual data? Confirm with `SELECT DISTINCT product_subtype FROM workspace.insurance_data.policies`.
-4. **Aggregation** — `AVG(claim_amount_thb)`, not `SUM`, not over the wrong table.
-5. **Currency framing** — output column called `avg_paid_thb` makes the unit explicit. If it's just `avg_amount` that's a minor nit.
-6. **Sanity check the number** — eyeball the result. If you got "23 THB" something is broken; if "5,000,000 THB" it's plausible.
+1. **Date column** — `loss_date` is the insurance convention for "claims in 2025" (date of loss occurrence). `settle_date` would answer "claims paid in 2025" — different semantics, different result.
+2. **"Paid" filter** — the prompt says *total **paid** claims*. Did Genie include `status = 'paid'`? If not, the SUM includes denied/pending/open claims and is wrong.
+3. **Case sensitivity** — is the literal `'paid'` (matching the data) or `'Paid'`? Run `SELECT DISTINCT status FROM workspace.insurance_data.claims` to confirm. Entity matching isn't on yet in Ex 1, so Genie WILL likely get this wrong.
+4. **Grouping** — `GROUP BY loss_type`, one row per loss_type.
+5. **Currency framing** — output column called `total_paid_thb` makes the unit explicit.
+6. **Sanity check the number** — eyeball each loss_type total. For our 5K-claim dataset, plausible annual paid totals per loss_type are in the millions to tens-of-millions of THB. If anything is "23 THB" or "10^12 THB", something is broken.
 
 **Common attendee mistakes to catch:**
 - Pasting Genie's SQL into the benchmark without running it themselves.
-- Skipping the sanity check on the result number.
-- Assuming `settle_date` and `loss_date` are interchangeable (they're not — a 2024 loss can be settled in 2025).
+- Skipping the sanity check on the loss_type totals.
+- Confusing `settle_date` and `loss_date`.
+- Counting unpaid claims in the "total paid" sum.
 
-If an attendee's question is too judgement-laden (*"who's our best agent?"*), redirect them to a more concrete formulation (*"top 5 agents by paid claim count in 2025"*) — the lesson is that benchmark questions need a deterministic right answer.
+**The point of this question being mandated:** it's the natural-language counterpart for the `claims_by_loss_type` SQL function attendees will build in Ex 5. By the end of the workshop, when the function is attached, Genie should call it and produce exactly this SQL deterministically — the benchmark pass becomes proof that Ex 5's work landed.
 
 ## Common attendee questions
 

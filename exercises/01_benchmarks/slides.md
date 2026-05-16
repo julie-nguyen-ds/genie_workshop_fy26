@@ -17,9 +17,9 @@
 ---
 
 ## Slide 3 — What you'll do
-1. Run the **6 pre-loaded benchmark questions** to set a baseline.
+1. Run the **5 pre-loaded benchmark questions** to set a baseline.
 2. **Look at the failures** — they preview every tuning lever we'll touch.
-3. **Add your own benchmark question** end-to-end, including verifying the expected SQL yourself.
+3. **Add a specific 6th question yourself** end-to-end: ask Genie, verify the SQL, save it. We'll close the loop on this one in Ex 5.
 
 We do **not tune anything** in this exercise. Each next exercise targets a different class of failure you'll see.
 
@@ -37,13 +37,13 @@ The benchmark = your regression suite. Re-run at end of workshop to see the scor
 
 ---
 
-## Slide 5 — Add your own benchmark
-Ask Genie *"What's our average paid claim amount for property fire losses in 2025?"* in a fresh chat thread. Then:
+## Slide 5 — Add the 6th benchmark question
+Ask Genie *"Show me total paid claims by loss type for 2025"* in a fresh chat thread. Then:
 1. Expand → **Show generated SQL**, copy it.
-2. Run that SQL in a SQL editor. **Verify** the filter (which date column? which status?), the join, the aggregation, the population.
-3. Sanity-check the number.
+2. Run that SQL in a SQL editor. **Verify** the date column (`loss_date`, not `settle_date`), the `status = 'paid'` filter, the case, the grouping, and **sanity-check** each loss_type's total.
+3. Fix anything wrong; that corrected SQL is your expected SQL.
 4. Add the verified Q+SQL pair via **Benchmark tab → Add question**.
-5. Re-run.
+5. Re-run — this question is the one Ex 5's UC function (`claims_by_loss_type`) will pin later, closing the loop.
 
 **Never accept Genie's SQL as the expected SQL without checking it yourself** — you'd be grading the test taker against their own answer key.
 

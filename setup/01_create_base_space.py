@@ -100,7 +100,9 @@ print(f"warehouse_id: {warehouse_id}")
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Load the 6 starter benchmark questions for Exercise 1
+# MAGIC ## Load the 5 starter benchmark questions for Exercise 1
+# MAGIC
+# MAGIC Attendees will add a 6th question themselves during Part B of Ex 1.
 # MAGIC
 # MAGIC Reads `exercises/01_benchmarks/benchmark_questions.csv` (sits next to this
 # MAGIC notebook in workspace files) and builds the `benchmarks.questions` block
