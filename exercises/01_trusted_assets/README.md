@@ -18,7 +18,7 @@ You'll add one of each.
 
 ---
 
-## Part A — SQL function (~12 min)
+## Part A — SQL function (~13 min)
 
 We'll add a function that aggregates claims by loss type over a date range. Before we add anything, let's see *why* we need it.
 
@@ -71,10 +71,24 @@ Run it. Test it standalone:
 SELECT * FROM workspace.insurance_data.claims_by_loss_type(DATE'2025-01-01', DATE'2025-12-31');
 ```
 
-### Step 3. Attach the function to the Genie space (~1 min)
+### Step 3. Attach the function to the Genie space (~2 min)
 1. Open the workshop Genie space.
 2. Right rail → **Functions** → **Add functions**.
 3. Search for `claims_by_loss_type` and add it.
+4. When prompted, fill in the two fields shown in the attach dialog:
+
+   - **Sample question:**
+     > *Show me total paid claims by loss type for 2025.*
+
+   - **Usage guidance:**
+     > *Use this function whenever the user asks for claims grouped by `loss_type` over a date range. Returns `claim_count` and `total_paid_thb` (only `status = 'paid'` claims are summed) for losses with `loss_date` between `start_date` and `end_date` inclusive. For "2025" pass `DATE'2025-01-01'` and `DATE'2025-12-31'`; for a single month pass the first and last day of that month.*
+
+**Why both fields?** The function's UC `COMMENT` is for humans browsing the catalog — Genie's planner doesn't lean on it much. The **sample question** and **usage guidance** are what Genie actually reads when deciding *whether* to call the function for a user prompt:
+
+- The sample question pins a canonical phrasing so Genie's semantic match has something to score against — without it, paraphrases like *"paid claims, broken out by loss type, in 2025"* may not trigger the function.
+- The usage guidance encodes the assumptions baked into the SQL (date column = `loss_date`, only paid claims, THB) so Genie can map a user's window ("2025", "Q1 2026", "last month") to the right `start_date` / `end_date` arguments. It also tells Genie *not* to call the function for adjacent-but-different questions (e.g. "claims by status" — wrong grouping).
+
+Skip these two fields and Genie sees only the signature + return type. It'll still work *sometimes*, but you'll lose the Trusted badge any time a user phrases their question even slightly differently.
 
 ### Step 4. Re-ask and compare (~3 min)
 

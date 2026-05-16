@@ -20,9 +20,9 @@ Two flavors today:
 ---
 
 ## Slide 3 — What you'll do
-Part A (12 min) — **see it before you fix it**:
+Part A (13 min) — **see it before you fix it**:
 1. Ask Genie *"Show me total paid claims by loss type for 2025"* — observe what it generates. Likely uses the wrong date column, or sums unpaid claims, or renames the output column each run.
-2. Write `claims_by_loss_type(start_date, end_date)` as a UC function, attach to the space.
+2. Write `claims_by_loss_type(start_date, end_date)` as a UC function, attach to the space — including a **sample question** + **usage guidance** so Genie knows when to call it.
 3. Ask the same question again — Trusted badge, consistent columns, correct filter.
 
 Part B (10 min): add a parameterized example SQL "Top 5 agents by claim count in `:province`", ask Genie → Trusted badge.
