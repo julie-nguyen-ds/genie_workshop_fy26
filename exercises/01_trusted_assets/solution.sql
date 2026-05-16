@@ -2,7 +2,7 @@
 
 -- Part A: SQL function
 CREATE OR REPLACE FUNCTION
-  main.thai_pc_insurance_workshop.claims_by_loss_type(
+  genie_workshop.insurance_data.claims_by_loss_type(
     start_date DATE COMMENT 'Inclusive start of the loss date window',
     end_date DATE COMMENT 'Inclusive end of the loss date window'
   )
@@ -13,13 +13,13 @@ CREATE OR REPLACE FUNCTION
       loss_type,
       COUNT(*) AS claim_count,
       COALESCE(SUM(CASE WHEN status = 'paid' THEN claim_amount_thb END), 0) AS total_paid_thb
-    FROM main.thai_pc_insurance_workshop.claims
+    FROM genie_workshop.insurance_data.claims
     WHERE loss_date BETWEEN start_date AND end_date
     GROUP BY loss_type
     ORDER BY claim_count DESC;
 
 -- Smoke test
-SELECT * FROM main.thai_pc_insurance_workshop.claims_by_loss_type(DATE'2025-01-01', DATE'2025-12-31');
+SELECT * FROM genie_workshop.insurance_data.claims_by_loss_type(DATE'2025-01-01', DATE'2025-12-31');
 
 
 -- Part B: parameterized example SQL (paste into the Example SQL panel of the space)
@@ -29,10 +29,10 @@ SELECT
   a.agent_id,
   a.agent_name,
   COUNT(cl.claim_id) AS claim_count
-FROM main.thai_pc_insurance_workshop.agents a
-JOIN main.thai_pc_insurance_workshop.policies p ON p.agent_id = a.agent_id
-JOIN main.thai_pc_insurance_workshop.claims cl  ON cl.policy_id = p.policy_id
-JOIN main.thai_pc_insurance_workshop.branches b ON b.branch_id = a.branch_id
+FROM genie_workshop.insurance_data.agents a
+JOIN genie_workshop.insurance_data.policies p ON p.agent_id = a.agent_id
+JOIN genie_workshop.insurance_data.claims cl  ON cl.policy_id = p.policy_id
+JOIN genie_workshop.insurance_data.branches b ON b.branch_id = a.branch_id
 WHERE b.province = :province
 GROUP BY a.agent_id, a.agent_name
 ORDER BY claim_count DESC

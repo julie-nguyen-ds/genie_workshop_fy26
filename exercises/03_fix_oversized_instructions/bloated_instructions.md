@@ -33,44 +33,44 @@ GLOSSARY:
   policy's expiry_date for the same customer.
 
 TABLES:
-- main.thai_pc_insurance_workshop.customers - one row per policyholder. Joins to
+- genie_workshop.insurance_data.customers - one row per policyholder. Joins to
   policies via customer_id. Has province (Thai province like Bangkok, Phuket etc.),
   occupation, dob (use this to compute age), gender, customer_since (acquisition
   date).
-- main.thai_pc_insurance_workshop.policies - one row per issued policy. Joins to
+- genie_workshop.insurance_data.policies - one row per issued policy. Joins to
   customers via customer_id, to agents via agent_id. product_line is either 'motor'
   or 'property'. product_subtype includes motor_voluntary, motor_compulsory,
   property_fire, property_allrisk, property_flood. status is active, lapsed,
   or cancelled. All monetary columns end in _thb and are in Thai Baht.
-- main.thai_pc_insurance_workshop.claims - one row per claim. Joins to policies
+- genie_workshop.insurance_data.claims - one row per claim. Joins to policies
   via policy_id. NOTE: there is no agent_id on claims; if you need to filter or
   group claims by agent, you must join through policies first. loss_date is when
   the loss occurred; report_date is when it was reported; settle_date is when it
   was paid or denied (NULL if still open or pending). status is open, paid,
   denied, pending. fraud_flag is a boolean.
-- main.thai_pc_insurance_workshop.agents - one row per licensed agent. Joins to
+- genie_workshop.insurance_data.agents - one row per licensed agent. Joins to
   branches via branch_id. commission_tier is bronze, silver, or gold.
-- main.thai_pc_insurance_workshop.branches - one row per branch. Has province
+- genie_workshop.insurance_data.branches - one row per branch. Has province
   and region (Central, North, Northeast, South, East).
 
 SQL PATTERNS YOU MUST USE:
 
 Loss ratio for any cohort:
 SELECT SUM(cl.claim_amount_thb) / SUM(p.annual_premium_thb) AS loss_ratio
-FROM main.thai_pc_insurance_workshop.policies p
-LEFT JOIN main.thai_pc_insurance_workshop.claims cl ON cl.policy_id = p.policy_id;
+FROM genie_workshop.insurance_data.policies p
+LEFT JOIN genie_workshop.insurance_data.claims cl ON cl.policy_id = p.policy_id;
 
 Top N agents by claim count with branch:
 SELECT a.agent_name, b.branch_name, COUNT(cl.claim_id) AS claim_count
-FROM main.thai_pc_insurance_workshop.agents a
-JOIN main.thai_pc_insurance_workshop.policies p ON p.agent_id = a.agent_id
-JOIN main.thai_pc_insurance_workshop.claims cl ON cl.policy_id = p.policy_id
-JOIN main.thai_pc_insurance_workshop.branches b ON b.branch_id = a.branch_id
+FROM genie_workshop.insurance_data.agents a
+JOIN genie_workshop.insurance_data.policies p ON p.agent_id = a.agent_id
+JOIN genie_workshop.insurance_data.claims cl ON cl.policy_id = p.policy_id
+JOIN genie_workshop.insurance_data.branches b ON b.branch_id = a.branch_id
 GROUP BY a.agent_name, b.branch_name
 ORDER BY claim_count DESC LIMIT 10;
 
 In-force policies as of today:
-SELECT * FROM main.thai_pc_insurance_workshop.policies
+SELECT * FROM genie_workshop.insurance_data.policies
 WHERE status = 'active'
   AND effective_date <= current_date()
   AND expiry_date >= current_date();
@@ -80,7 +80,7 @@ SELECT policy_id,
        annual_premium_thb * GREATEST(0, LEAST(DATEDIFF(d, effective_date),
          DATEDIFF(expiry_date, effective_date))) / DATEDIFF(expiry_date, effective_date)
        AS earned_premium_thb
-FROM main.thai_pc_insurance_workshop.policies;
+FROM genie_workshop.insurance_data.policies;
 
 BUSINESS RULES:
 - All monetary amounts are in THB. Never convert to USD unless asked.
@@ -101,7 +101,7 @@ A: Ambiguous. Ask the user: best by policies sold, by premium written, by low
 loss ratio, or by claim count? Pick one before answering.
 
 Q: How many customers do we have?
-A: SELECT COUNT(*) FROM main.thai_pc_insurance_workshop.customers.
+A: SELECT COUNT(*) FROM genie_workshop.insurance_data.customers.
 
 Q: What is our loss ratio?
 A: See the SQL pattern above. Usually they want it scoped to a period or product

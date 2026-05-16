@@ -16,9 +16,9 @@
 - [ ] Workspace URL + login confirmed
 - [ ] Genie entitlement enabled on your user
 - [ ] SQL warehouse you can attach to a space (Serverless OK)
-- [ ] Write access to a UC catalog (default `main`, schema `thai_pc_insurance_workshop`)
+- [ ] `CREATE CATALOG` privilege on the metastore (the setup creates catalog `genie_workshop`, schema `insurance_data`)
 - [ ] Personal Access Token generated (only needed for Ex 3 if you want to redo the seeding yourself)
-- [ ] You've run `setup/00_load_data.sql` and can `SELECT * FROM main.thai_pc_insurance_workshop.policies LIMIT 5;`
+- [ ] You've run `setup/00_load_data.sql` and can `SELECT * FROM genie_workshop.insurance_data.policies LIMIT 5;`
 
 ## Pre-flight (you, the facilitator, the morning of)
 

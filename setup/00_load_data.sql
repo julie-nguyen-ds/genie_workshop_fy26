@@ -2,17 +2,20 @@
 -- Run in a SQL editor or notebook attached to a Serverless SQL warehouse.
 -- Idempotent: safe to re-run; tables are dropped and recreated.
 
--- 1. Pick a catalog you have CREATE SCHEMA on. Change if needed.
-USE CATALOG main;
+-- 1. Create the workshop catalog and schema. Requires CREATE CATALOG on the metastore.
+CREATE CATALOG IF NOT EXISTS genie_workshop
+  COMMENT 'Catalog for Genie workshop assets';
 
-CREATE SCHEMA IF NOT EXISTS thai_pc_insurance_workshop
+USE CATALOG genie_workshop;
+
+CREATE SCHEMA IF NOT EXISTS insurance_data
   COMMENT 'Sample Thai P&C insurance data for the Genie workshop';
 
-USE SCHEMA thai_pc_insurance_workshop;
+USE SCHEMA insurance_data;
 
 -- 2. Stage CSVs in a Volume so COPY INTO can read them.
 -- Upload all 5 CSVs from data/ into this volume (UI: Catalog > Volumes > Upload).
--- Or use the CLI: `databricks fs cp data/*.csv dbfs:/Volumes/main/thai_pc_insurance_workshop/raw/`
+-- Or use the CLI: `databricks fs cp data/*.csv dbfs:/Volumes/genie_workshop/insurance_data/raw/`
 CREATE VOLUME IF NOT EXISTS raw;
 
 -- 3. Define tables with explicit schemas (don't rely on inference for a workshop).
@@ -80,27 +83,27 @@ CREATE TABLE claims (
 
 -- 4. Load. Adjust the volume path to match where you uploaded the CSVs.
 COPY INTO branches
-  FROM '/Volumes/main/thai_pc_insurance_workshop/raw/branches.csv'
+  FROM '/Volumes/genie_workshop/insurance_data/raw/branches.csv'
   FILEFORMAT = CSV
   FORMAT_OPTIONS ('header' = 'true', 'inferSchema' = 'false');
 
 COPY INTO agents
-  FROM '/Volumes/main/thai_pc_insurance_workshop/raw/agents.csv'
+  FROM '/Volumes/genie_workshop/insurance_data/raw/agents.csv'
   FILEFORMAT = CSV
   FORMAT_OPTIONS ('header' = 'true', 'inferSchema' = 'false');
 
 COPY INTO customers
-  FROM '/Volumes/main/thai_pc_insurance_workshop/raw/customers.csv'
+  FROM '/Volumes/genie_workshop/insurance_data/raw/customers.csv'
   FILEFORMAT = CSV
   FORMAT_OPTIONS ('header' = 'true', 'inferSchema' = 'false');
 
 COPY INTO policies
-  FROM '/Volumes/main/thai_pc_insurance_workshop/raw/policies.csv'
+  FROM '/Volumes/genie_workshop/insurance_data/raw/policies.csv'
   FILEFORMAT = CSV
   FORMAT_OPTIONS ('header' = 'true', 'inferSchema' = 'false');
 
 COPY INTO claims
-  FROM '/Volumes/main/thai_pc_insurance_workshop/raw/claims.csv'
+  FROM '/Volumes/genie_workshop/insurance_data/raw/claims.csv'
   FILEFORMAT = CSV
   FORMAT_OPTIONS ('header' = 'true', 'inferSchema' = 'false');
 

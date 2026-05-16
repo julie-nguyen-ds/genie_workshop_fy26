@@ -55,12 +55,12 @@ That's **9 atomic instructions** instead of one monster.
   {
     "id": "eq_top_agents_by_claims",
     "question": ["Top N agents by claim count, with branch"],
-    "sql": "SELECT a.agent_name, b.branch_name, COUNT(cl.claim_id) AS claim_count FROM main.thai_pc_insurance_workshop.agents a JOIN main.thai_pc_insurance_workshop.policies p ON p.agent_id = a.agent_id JOIN main.thai_pc_insurance_workshop.claims cl ON cl.policy_id = p.policy_id JOIN main.thai_pc_insurance_workshop.branches b ON b.branch_id = a.branch_id GROUP BY a.agent_name, b.branch_name ORDER BY claim_count DESC LIMIT 10"
+    "sql": "SELECT a.agent_name, b.branch_name, COUNT(cl.claim_id) AS claim_count FROM genie_workshop.insurance_data.agents a JOIN genie_workshop.insurance_data.policies p ON p.agent_id = a.agent_id JOIN genie_workshop.insurance_data.claims cl ON cl.policy_id = p.policy_id JOIN genie_workshop.insurance_data.branches b ON b.branch_id = a.branch_id GROUP BY a.agent_name, b.branch_name ORDER BY claim_count DESC LIMIT 10"
   },
   {
     "id": "eq_in_force_now",
     "question": ["List in-force policies as of today"],
-    "sql": "SELECT * FROM main.thai_pc_insurance_workshop.policies WHERE status = 'active' AND effective_date <= current_date() AND expiry_date >= current_date()"
+    "sql": "SELECT * FROM genie_workshop.insurance_data.policies WHERE status = 'active' AND effective_date <= current_date() AND expiry_date >= current_date()"
   }
 ]
 ```
@@ -69,7 +69,7 @@ That's **9 atomic instructions** instead of one monster.
 
 ```json
 {
-  "identifier": "main.thai_pc_insurance_workshop.claims",
+  "identifier": "genie_workshop.insurance_data.claims",
   "description": ["One row per filed claim. Joins to policies via policy_id (claims has no agent_id). loss_date = when loss occurred; report_date = when reported; settle_date = paid/denied date (NULL if open/pending). status in (open, paid, denied, pending). fraud_flag is boolean."]
 }
 ```

@@ -20,8 +20,8 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-CATALOG = "main"
-SCHEMA = "thai_pc_insurance_workshop"
+CATALOG = "genie_workshop"
+SCHEMA = "insurance_data"
 TABLES = ["customers", "branches", "agents", "policies", "claims"]
 
 BLOATED_PATH = Path(__file__).parent / "bloated_instructions.md"
