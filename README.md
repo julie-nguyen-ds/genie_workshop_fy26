@@ -35,8 +35,9 @@ For the facilitator:
    - Creates `main.insurance_data.{customers, policies, claims, agents, branches}`.
 
 2. **Create the base Genie space** (used by Exercises 1, 2, 4)
-   - Open `setup/01_create_base_space.py` as a Databricks notebook, paste your SQL Warehouse ID into the `warehouse_id` widget, and Run All.
-   - Auth is picked up from the notebook context — no env vars or PAT needed.
+   - Open `setup/01_create_base_space.py` as a Databricks notebook and Run All.
+   - Auth (host + token) is picked up from the notebook context — no env vars or PAT.
+   - The `warehouse_id` widget can be left blank: the notebook auto-picks the first Pro/Serverless warehouse in the workspace, or creates a small Serverless Pro one if none exists.
    - Output prints the new `space_id` and a direct URL — share with attendees.
 
 3. **Create the broken space for Exercise 3** (separate space, intentionally over-sized instructions)
