@@ -18,11 +18,11 @@
 - [ ] SQL warehouse you can attach to a space (Serverless OK)
 - [ ] Write access to a UC catalog (default `main`, schema `insurance_data`)
 - [ ] Personal Access Token generated (only needed for Ex 3 if you want to redo the seeding yourself)
-- [ ] You've run `setup/00_load_data.sql` and can `SELECT * FROM main.insurance_data.policies LIMIT 5;`
+- [ ] You've run `setup/00_load_data.py` (as a Databricks notebook) and can `SELECT * FROM main.insurance_data.policies LIMIT 5;`
 
 ## Pre-flight (you, the facilitator, the morning of)
 
-1. Run `setup/00_load_data.sql` in your demo workspace — confirm 5 tables, expected row counts.
+1. Run `setup/00_load_data.py` (open as Databricks notebook, Run All) in your demo workspace — confirm 5 tables, expected row counts.
 2. Run `setup/01_create_base_space.py` — write down the `space_id`; open it; confirm all 5 tables show in the right rail.
 3. Run `exercises/03_fix_oversized_instructions/seed_broken_space.py` — write down the broken `space_id`; open it; confirm you see the over-sized instructions warning or that the space materially misbehaves.
 4. Have `solution.sql`, `tuning_walkthrough.md`, `refactored_solution.md`, and `solution.md` open in tabs — for the moments when you need to unblock the room.

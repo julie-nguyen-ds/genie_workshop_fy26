@@ -30,10 +30,9 @@ For the facilitator:
 ## Setup (do this once, before the session)
 
 1. **Load the sample data**
-   ```sql
-   -- Open setup/00_load_data.sql in a notebook or SQL editor and run.
-   -- Creates main.insurance_data.{customers, policies, claims, agents, branches}
-   ```
+   - Open `setup/00_load_data.py` as a Databricks notebook (Workspace → Repos / Git folder, then "Open as notebook"), attach to a cluster, and Run All.
+   - The notebook reads CSVs from `../data/` directly out of workspace files — no Volume upload required.
+   - Creates `main.insurance_data.{customers, policies, claims, agents, branches}`.
 
 2. **Create the base Genie space** (used by Exercises 1, 2, 4)
    ```bash
