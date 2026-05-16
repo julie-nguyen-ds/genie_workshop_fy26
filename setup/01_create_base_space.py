@@ -20,6 +20,7 @@
 dbutils.widgets.text("warehouse_id", "", "SQL Warehouse ID (blank = auto-pick)")
 warehouse_id_override = dbutils.widgets.get("warehouse_id").strip()
 
+
 CATALOG = "workspace"
 SCHEMA = "insurance_data"
 TABLES = ["customers", "branches", "agents", "policies", "claims"]
@@ -127,32 +128,84 @@ else:
 # COMMAND ----------
 
 serialized_space = json.dumps({
-    "version": 1,
+    "version": 2,
     "config": {
         "sample_questions": [
-            {"id": "q1", "question": ["What was our total premium written last month?"]},
-            {"id": "q2", "question": ["How many claims do we have in motor by loss type this year?"]},
-            {"id": "q3", "question": ["Which branch had the highest claims paid in Q1 2026?"]},
-            {"id": "q4", "question": ["Show me the top 10 agents by policies sold."]},
+            {"id": "00000000000000000000000000000001", "question": ["What was our total premium written last month?"]},
+            {"id": "00000000000000000000000000000002", "question": ["How many claims do we have in motor by loss type this year?"]},
+            {"id": "00000000000000000000000000000003", "question": ["Which branch had the highest claims paid in Q1 2026?"]},
+            {"id": "00000000000000000000000000000004", "question": ["Show me the top 10 agents by policies sold."]},
         ],
     },
     "data_sources": {
-        "tables": [
+        "tables": sorted([
             {
                 "identifier": f"{CATALOG}.{SCHEMA}.{t}",
                 "description": [f"See table comment in Unity Catalog for {t}."],
             }
             for t in TABLES
-        ],
+        ], key=lambda x: x["identifier"]),
     },
     "instructions": {
         "text_instructions": [
-            {"id": "ti_currency", "content": ["All monetary amounts are in Thai Baht (THB). Columns ending in _thb are amounts in THB."]},
-            {"id": "ti_today", "content": ["Use current_date() when the user says 'today', 'now', or 'current'."]},
+            {"id": "00000000000000000000000000000010", "content": ["All monetary amounts are in Thai Baht (THB). Columns ending in _thb are amounts in THB. Use current_date() when the user says 'today', 'now', or 'current'."]},
         ],
-        "example_question_sqls": [],
-        "sql_snippets": [],
+        "example_question_sqls": [
+            {
+                "id": "00000000000000000000000000000020",
+                "question": ["What was our total premium written last month?"],
+                "sql": [
+                    "SELECT SUM(annual_premium_thb) AS total_premium_written_thb\n",
+                    "FROM workspace.insurance_data.policies\n",
+                    "WHERE effective_date >= DATE_TRUNC('month', CURRENT_DATE - INTERVAL 1 MONTH)\n",
+                    "  AND effective_date < DATE_TRUNC('month', CURRENT_DATE)",
+                ],
+            },
+            {
+                "id": "00000000000000000000000000000021",
+                "question": ["How many claims do we have in motor by loss type this year?"],
+                "sql": [
+                    "SELECT c.loss_type, COUNT(*) AS num_claims\n",
+                    "FROM workspace.insurance_data.claims c\n",
+                    "JOIN workspace.insurance_data.policies p ON c.policy_id = p.policy_id\n",
+                    "WHERE p.product_line = 'Motor'\n",
+                    "  AND c.loss_date >= DATE_TRUNC('year', CURRENT_DATE)\n",
+                    "GROUP BY c.loss_type\n",
+                    "ORDER BY num_claims DESC",
+                ],
+            },
+            {
+                "id": "00000000000000000000000000000022",
+                "question": ["Which branch had the highest claims paid in Q1 2026?"],
+                "sql": [
+                    "SELECT b.branch_name, SUM(c.claim_amount_thb) AS total_claims_paid_thb\n",
+                    "FROM workspace.insurance_data.claims c\n",
+                    "JOIN workspace.insurance_data.policies p ON c.policy_id = p.policy_id\n",
+                    "JOIN workspace.insurance_data.agents a ON p.agent_id = a.agent_id\n",
+                    "JOIN workspace.insurance_data.branches b ON a.branch_id = b.branch_id\n",
+                    "WHERE c.status = 'Paid'\n",
+                    "  AND c.settle_date >= '2026-01-01'\n",
+                    "  AND c.settle_date < '2026-04-01'\n",
+                    "GROUP BY b.branch_name\n",
+                    "ORDER BY total_claims_paid_thb DESC\n",
+                    "LIMIT 1",
+                ],
+            },
+            {
+                "id": "00000000000000000000000000000023",
+                "question": ["Show me the top 10 agents by policies sold."],
+                "sql": [
+                    "SELECT a.agent_name, COUNT(*) AS policies_sold\n",
+                    "FROM workspace.insurance_data.policies p\n",
+                    "JOIN workspace.insurance_data.agents a ON p.agent_id = a.agent_id\n",
+                    "GROUP BY a.agent_name\n",
+                    "ORDER BY policies_sold DESC\n",
+                    "LIMIT 10",
+                ],
+            },
+        ],
         "join_specs": [],
+        "sql_snippets": {"filters": [], "expressions": [], "measures": []},
     },
 })
 
@@ -180,3 +233,4 @@ print(f"open:        {HOST.rstrip('/')}/genie/rooms/{space_id}")
 
 # MAGIC %md
 # MAGIC Share the `space_id` printed above with attendees for Exercises 1, 2, and 4.
+
