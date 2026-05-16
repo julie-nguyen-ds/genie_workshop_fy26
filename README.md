@@ -41,10 +41,9 @@ For the facilitator:
    - Output prints the new `space_id` and a direct URL — share with attendees.
 
 3. **Create the broken space for Exercise 3** (separate space, intentionally over-sized instructions)
-   ```bash
-   python exercises/03_fix_oversized_instructions/seed_broken_space.py
-   # → prints the broken space_id; share with attendees just before Ex 3
-   ```
+   - Open `exercises/03_fix_oversized_instructions/seed_broken_space.py` as a Databricks notebook and Run All.
+   - Same auth + warehouse auto-pick as `01_create_base_space` — no env vars needed.
+   - Output prints the broken `space_id` — share with attendees just before Ex 3.
 
 ## Repo layout
 
