@@ -80,13 +80,39 @@ SELECT * FROM workspace.insurance_data.claims_by_loss_type(DATE'2025-01-01', DAT
    - **Sample question:**
      > *Show me total paid claims by loss type for 2025.*
 
-   - **Usage guidance:**
-     > *Use this function whenever the user asks for claims grouped by `loss_type` over a date range. Returns `claim_count` and `total_paid_thb` (only `status = 'paid'` claims are summed) for losses with `loss_date` between `start_date` and `end_date` inclusive. For "2025" pass `DATE'2025-01-01'` and `DATE'2025-12-31'`; for a single month pass the first and last day of that month.*
+   - **Usage guidance** (list the *phrasings* that should hit this function, not just what it does — Genie matches user prompts against these examples semantically):
+     ```
+     Call this function whenever the user asks for claims grouped by loss_type
+     over a date range. The function filters on loss_date and only sums claims
+     where status = 'paid'.
 
-**Why both fields?** The function's UC `COMMENT` is for humans browsing the catalog — Genie's planner doesn't lean on it much. The **sample question** and **usage guidance** are what Genie actually reads when deciding *whether* to call the function for a user prompt:
+     Phrasings that should all trigger this function:
+       • "Show me total paid claims by loss type for 2025"
+       • "Paid claims by loss_type in 2025"
+       • "Claims broken down by loss type, January 2025"
+       • "Loss type distribution of paid claims this year"
+       • "What's our paid claim total per loss type for Q1 2026?"
+       • "How much have we paid out by loss type last month?"
+       • "Top loss types by paid claim amount in 2025"
+       • "Breakdown of claims by type of loss for 2025"
 
-- The sample question pins a canonical phrasing so Genie's semantic match has something to score against — without it, paraphrases like *"paid claims, broken out by loss type, in 2025"* may not trigger the function.
-- The usage guidance encodes the assumptions baked into the SQL (date column = `loss_date`, only paid claims, THB) so Genie can map a user's window ("2025", "Q1 2026", "last month") to the right `start_date` / `end_date` arguments. It also tells Genie *not* to call the function for adjacent-but-different questions (e.g. "claims by status" — wrong grouping).
+     Map the user's time window to start_date / end_date:
+       • "2025"           → DATE'2025-01-01', DATE'2025-12-31'
+       • "January 2025"   → DATE'2025-01-01', DATE'2025-01-31'
+       • "Q1 2026"        → DATE'2026-01-01', DATE'2026-03-31'
+       • "last month"     → first and last day of the previous calendar month
+       • "year-to-date"   → DATE'YYYY-01-01' through current_date()
+
+     Do NOT call this function for:
+       • Claims grouped by something other than loss_type (status, branch, agent)
+       • Questions about open / pending / denied claims (function only sums paid)
+       • Filtered further by product_line or product_subtype (write a custom query)
+     ```
+
+**Why both fields, and why list phrasings?** The function's UC `COMMENT` is for humans browsing the catalog — Genie's planner doesn't lean on it much. The **sample question** and **usage guidance** are what Genie actually reads when deciding *whether* to call the function for a user prompt:
+
+- The sample question pins a single canonical phrasing.
+- The usage guidance widens the net. Users won't say the canonical phrase verbatim — they'll say *"breakdown of claims by type of loss"*, *"paid loss-type totals last month"*, *"how much have we paid per loss type"*. By listing those paraphrases explicitly, you give Genie's semantic matcher concrete anchors to score against — and you also list **what NOT to do** so Genie doesn't mis-fire on adjacent-but-different questions (e.g. *"claims by status"* — wrong grouping; *"open claims by loss type"* — wrong status filter).
 
 Skip these two fields and Genie sees only the signature + return type. It'll still work *sometimes*, but you'll lose the Trusted badge any time a user phrases their question even slightly differently.
 
