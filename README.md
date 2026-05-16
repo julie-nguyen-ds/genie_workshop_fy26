@@ -5,16 +5,17 @@ A 2-hour hands-on workshop teaching analytics teams how to **build and operate**
 ## Audience
 Analytics / BI engineers and SAs who will own a Genie space day-to-day. Attendees should already have a Databricks workspace with Genie enabled and a SQL warehouse they can attach to a space.
 
-## Agenda (~2h10m)
+## Agenda (~2h15m)
 
 | Time | Segment |
 |---|---|
 | 0:00 – 0:10 | Intro — what makes a good Genie space (3 asset types) |
-| 0:10 – 0:35 | **Exercise 1** — Create SQL trusted assets |
-| 0:35 – 1:00 | **Exercise 2** — Benchmarks: run, score, tune |
-| 1:00 – 1:25 | **Exercise 3** — Fix oversized instructions |
-| 1:25 – 1:50 | **Exercise 4** — Business glossary & general instructions |
-| 1:50 – 2:00 | Wrap — checklist for shipping a production Genie space |
+| 0:10 – 0:22 | **Exercise 1** — Entity matching & format assistance (fix the silent-zero) |
+| 0:22 – 0:47 | **Exercise 2** — Benchmarks: run, score, tune |
+| 0:47 – 1:12 | **Exercise 3** — Fix oversized instructions |
+| 1:12 – 1:37 | **Exercise 4** — Business glossary & general instructions |
+| 1:37 – 2:05 | **Exercise 5** — Create SQL trusted assets |
+| 2:05 – 2:15 | Wrap — checklist for shipping a production Genie space |
 
 ## Prereqs
 

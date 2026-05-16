@@ -1,9 +1,9 @@
-# Exercise 1 — Trusted Assets (slides)
+# Exercise 5 — Trusted Assets (slides)
 
 ---
 
 ## Slide 1 — Title
-**Exercise 1: SQL Trusted Assets**
+**Exercise 5: SQL Trusted Assets**
 *25 minutes — make Genie show the Trusted badge*
 
 ---

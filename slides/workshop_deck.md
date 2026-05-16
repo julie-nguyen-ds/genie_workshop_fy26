@@ -37,11 +37,12 @@ The rest of the workshop is learning when to reach for which.
 
 ## 4. Agenda
 | 0:00 | Intro (you are here) |
-| 0:10 | Ex 1 — Trusted assets |
-| 0:35 | Ex 2 — Benchmarks: run, score, tune |
-| 1:00 | Ex 3 — Fix oversized instructions |
-| 1:25 | Ex 4 — Business glossary |
-| 1:50 | Wrap & production checklist |
+| 0:10 | Ex 1 — Entity matching & format assistance |
+| 0:22 | Ex 2 — Benchmarks: run, score, tune |
+| 0:47 | Ex 3 — Fix oversized instructions |
+| 1:12 | Ex 4 — Business glossary |
+| 1:37 | Ex 5 — SQL trusted assets |
+| 2:05 | Wrap & production checklist |
 
 ---
 
@@ -57,8 +58,8 @@ All in `workspace.insurance_data`. Sample data is already loaded for you.
 
 ---
 
-## (Section break) 6. Exercise 1 — Trusted Assets
-*See `exercises/01_trusted_assets/slides.md` for the per-exercise slide block.*
+## (Section break) 6. Exercise 1 — Entity Matching & Format Assistance
+*See `exercises/01_entity_matching/slides.md` for the per-exercise slide block.*
 
 ---
 
@@ -74,6 +75,11 @@ All in `workspace.insurance_data`. Sample data is already loaded for you.
 
 ## (Section break) 9. Exercise 4 — Business Glossary
 *See `exercises/04_glossary_general_instructions/slides.md` for the per-exercise slide block.*
+
+---
+
+## (Section break) 9b. Exercise 5 — SQL Trusted Assets
+*See `exercises/05_trusted_assets/slides.md` for the per-exercise slide block.*
 
 ---
 
