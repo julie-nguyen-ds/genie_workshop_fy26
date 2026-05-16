@@ -20,7 +20,7 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-CATALOG = "main"
+CATALOG = "workspace"
 SCHEMA = "insurance_data"
 TABLES = ["customers", "branches", "agents", "policies", "claims"]
 

@@ -3,14 +3,14 @@
 # MAGIC # Bootstrap the Thai P&C Insurance Workshop Data
 # MAGIC
 # MAGIC Loads the 5 sample CSVs from `../data/` directly into Delta tables under
-# MAGIC `main.insurance_data`. No Volume / UC external location required —
+# MAGIC `workspace.insurance_data`. No Volume / UC external location required —
 # MAGIC reads CSVs from the workspace files alongside this notebook.
 # MAGIC
 # MAGIC Idempotent: safe to re-run. Tables are overwritten.
 
 # COMMAND ----------
 
-CATALOG = "main"
+CATALOG = "workspace"
 SCHEMA = "insurance_data"
 
 spark.sql(f"USE CATALOG {CATALOG}")

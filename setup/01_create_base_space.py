@@ -3,7 +3,7 @@
 # MAGIC # Create the Workshop's Base Genie Space
 # MAGIC
 # MAGIC Creates a minimal starter Genie space wired to the 5 tables in
-# MAGIC `main.insurance_data`. Attendees iterate on this space across
+# MAGIC `workspace.insurance_data`. Attendees iterate on this space across
 # MAGIC Exercises 1, 2, and 4. Exercise 3 has its own seed notebook with
 # MAGIC intentionally bloated instructions.
 # MAGIC
@@ -20,7 +20,7 @@
 dbutils.widgets.text("warehouse_id", "", "SQL Warehouse ID (blank = auto-pick)")
 warehouse_id_override = dbutils.widgets.get("warehouse_id").strip()
 
-CATALOG = "main"
+CATALOG = "workspace"
 SCHEMA = "insurance_data"
 TABLES = ["customers", "branches", "agents", "policies", "claims"]
 

@@ -46,10 +46,10 @@ or currently in force.
 ```sql
 -- Question: Top N agents by claim count, with their branch
 SELECT a.agent_name, b.branch_name, COUNT(cl.claim_id) AS claim_count
-FROM main.insurance_data.agents a
-JOIN main.insurance_data.policies p ON p.agent_id = a.agent_id
-JOIN main.insurance_data.claims cl  ON cl.policy_id = p.policy_id
-JOIN main.insurance_data.branches b ON b.branch_id = a.branch_id
+FROM workspace.insurance_data.agents a
+JOIN workspace.insurance_data.policies p ON p.agent_id = a.agent_id
+JOIN workspace.insurance_data.claims cl  ON cl.policy_id = p.policy_id
+JOIN workspace.insurance_data.branches b ON b.branch_id = a.branch_id
 GROUP BY a.agent_name, b.branch_name
 ORDER BY claim_count DESC
 LIMIT 10;

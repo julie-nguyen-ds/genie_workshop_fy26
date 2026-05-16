@@ -16,9 +16,9 @@
 - [ ] Workspace URL + login confirmed
 - [ ] Genie entitlement enabled on your user
 - [ ] SQL warehouse you can attach to a space (Serverless OK)
-- [ ] Write access to a UC catalog (default `main`, schema `insurance_data`)
+- [ ] Write access to a UC catalog (default `workspace` — the Databricks Free Edition default — schema `insurance_data`)
 - [ ] Personal Access Token generated (only needed for Ex 3 if you want to redo the seeding yourself)
-- [ ] You've run `setup/00_load_data.py` (as a Databricks notebook) and can `SELECT * FROM main.insurance_data.policies LIMIT 5;`
+- [ ] You've run `setup/00_load_data.py` (as a Databricks notebook) and can `SELECT * FROM workspace.insurance_data.policies LIMIT 5;`
 
 ## Pre-flight (you, the facilitator, the morning of)
 

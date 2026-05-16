@@ -14,7 +14,7 @@ You'll add one of each.
 
 ## Prerequisites
 - The base Genie space (`space_id` shared by facilitator).
-- `main.insurance_data` schema loaded.
+- `workspace.insurance_data` schema loaded.
 
 ---
 
@@ -27,7 +27,7 @@ Open a new SQL query (or use a notebook). Use `starter.sql` as your template, or
 
 ```sql
 CREATE OR REPLACE FUNCTION
-  main.insurance_data.claims_by_loss_type(
+  workspace.insurance_data.claims_by_loss_type(
     start_date DATE COMMENT 'Inclusive start of the loss date window',
     end_date DATE COMMENT 'Inclusive end of the loss date window'
   )
@@ -38,7 +38,7 @@ CREATE OR REPLACE FUNCTION
       loss_type,
       COUNT(*) AS claim_count,
       COALESCE(SUM(CASE WHEN status = 'paid' THEN claim_amount_thb END), 0) AS total_paid_thb
-    FROM main.insurance_data.claims
+    FROM workspace.insurance_data.claims
     WHERE loss_date BETWEEN start_date AND end_date
     GROUP BY loss_type
     ORDER BY claim_count DESC;
@@ -46,7 +46,7 @@ CREATE OR REPLACE FUNCTION
 
 Run it. Test it standalone:
 ```sql
-SELECT * FROM main.insurance_data.claims_by_loss_type(DATE'2025-01-01', DATE'2025-12-31');
+SELECT * FROM workspace.insurance_data.claims_by_loss_type(DATE'2025-01-01', DATE'2025-12-31');
 ```
 
 ### Step 2. Attach the function to the Genie space
@@ -75,10 +75,10 @@ SELECT
   a.agent_id,
   a.agent_name,
   COUNT(cl.claim_id) AS claim_count
-FROM main.insurance_data.agents a
-JOIN main.insurance_data.policies p ON p.agent_id = a.agent_id
-JOIN main.insurance_data.claims cl ON cl.policy_id = p.policy_id
-JOIN main.insurance_data.branches b ON b.branch_id = a.branch_id
+FROM workspace.insurance_data.agents a
+JOIN workspace.insurance_data.policies p ON p.agent_id = a.agent_id
+JOIN workspace.insurance_data.claims cl ON cl.policy_id = p.policy_id
+JOIN workspace.insurance_data.branches b ON b.branch_id = a.branch_id
 WHERE b.province = :province
 GROUP BY a.agent_id, a.agent_name
 ORDER BY claim_count DESC
