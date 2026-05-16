@@ -1,10 +1,10 @@
-# Exercise 1 — Entity Matching & Format Assistance (slides)
+# Exercise 2 — Entity Matching & Format Assistance (slides)
 
 ---
 
 ## Slide 1 — Title
-**Exercise 1: Entity Matching & Format Assistance**
-*~12 minutes — fix the silent-zero problem before writing any SQL*
+**Exercise 2: Entity Matching & Format Assistance**
+*~12 minutes — fix the silent-zero failures from the Ex 1 benchmark*
 
 ---
 

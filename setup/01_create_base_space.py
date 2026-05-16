@@ -153,9 +153,9 @@ print(f"open:     {HOST.rstrip('/')}/genie/rooms/{space_id}")
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Load the 5 starter benchmark questions for Exercise 2
+# MAGIC ## Load the 6 starter benchmark questions for Exercise 1
 # MAGIC
-# MAGIC Reads `exercises/02_benchmarks/benchmark_questions.csv` (sits next to this
+# MAGIC Reads `exercises/01_benchmarks/benchmark_questions.csv` (sits next to this
 # MAGIC repo in workspace files) and tries to attach the questions to the space's
 # MAGIC benchmark. If the Genie benchmark API isn't available on this workspace,
 # MAGIC the questions are printed below for the facilitator to add manually via
@@ -167,7 +167,7 @@ import os, csv
 
 notebook_path = ctx.notebookPath().get()
 csv_path = os.path.normpath(
-    f"/Workspace{os.path.dirname(notebook_path)}/../exercises/02_benchmarks/benchmark_questions.csv"
+    f"/Workspace{os.path.dirname(notebook_path)}/../exercises/01_benchmarks/benchmark_questions.csv"
 )
 
 with open(csv_path, encoding="utf-8") as f:

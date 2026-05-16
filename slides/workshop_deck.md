@@ -37,12 +37,12 @@ The rest of the workshop is learning when to reach for which.
 
 ## 4. Agenda
 | 0:00 | Intro (you are here) |
-| 0:10 | Ex 1 — Entity matching & format assistance |
-| 0:22 | Ex 2 — Benchmarks: run, score, tune |
-| 0:47 | Ex 3 — Fix oversized instructions |
-| 1:12 | Ex 4 — Business glossary |
-| 1:37 | Ex 5 — SQL trusted assets |
-| 2:05 | Wrap & production checklist |
+| 0:10 | Ex 1 — Benchmarks: run + add your own (set the baseline) |
+| 0:25 | Ex 2 — Entity matching & format assistance |
+| 0:37 | Ex 3 — Fix oversized instructions |
+| 1:02 | Ex 4 — Business glossary |
+| 1:27 | Ex 5 — SQL trusted assets |
+| 1:55 | Wrap — re-run benchmark & production checklist |
 
 ---
 
@@ -58,13 +58,13 @@ All in `workspace.insurance_data`. Sample data is already loaded for you.
 
 ---
 
-## (Section break) 6. Exercise 1 — Entity Matching & Format Assistance
-*See `exercises/01_entity_matching/slides.md` for the per-exercise slide block.*
+## (Section break) 6. Exercise 1 — Benchmarks
+*See `exercises/01_benchmarks/slides.md` for the per-exercise slide block.*
 
 ---
 
-## (Section break) 7. Exercise 2 — Benchmarks
-*See `exercises/02_benchmarks/slides.md` for the per-exercise slide block.*
+## (Section break) 7. Exercise 2 — Entity Matching & Format Assistance
+*See `exercises/02_entity_matching/slides.md` for the per-exercise slide block.*
 
 ---
 
