@@ -2,20 +2,17 @@
 
 This is the deep-dive cheat sheet for the live walk-through portion of Exercise 2.
 
-## The 10 benchmark questions and why each one is there
+## The 5 starter benchmark questions and why each one is there
 
 | # | Question | Difficulty | Lever needed |
 |---|---|---|---|
 | 1 | How many policies are currently active? | Easy | none — passes by default |
-| 2 | Total premium written in 2025 for motor | Easy | none |
-| 3 | How many claims paid in 2025? | Easy | none |
-| 4 | Total claim amount by loss type, motor only, 2025 | Moderate (filter through join) | usually passes; if not → example SQL |
-| 5 | Fraud-flagged claim count + total amount | Easy | none |
-| 6 | **Branch with most in-force policies** | Moderate | **text instruction for "in-force"** — engineered failure #1 |
-| 7 | **Top 10 agents by claim count + branch** | Hard (3-way join) | **example SQL** — engineered failure #2 |
-| 8 | % of motor policies with at least one claim | Moderate | usually passes; uses LEFT JOIN |
-| 9 | Avg paid for property fire losses 2025 | Moderate | usually passes |
-| 10 | Total sum insured for in-force property by region | Hard (in-force + 3-way join) | will pass *after* fixes for 6+7 are in place |
+| 2 | How many claims paid in 2025? | Easy | none |
+| 3 | Total claim amount by loss type, motor only, 2025 | Moderate (filter through join) | usually passes; if not → example SQL |
+| 4 | **Which branch has the most active in-force policies right now?** | Moderate | **text instruction for "in-force"** — engineered failure #1 |
+| 5 | **Top 10 agents by claim count + branch** | Hard (3-way join) | **example SQL** — engineered failure #2 |
+
+3 easy/moderate to set the baseline, 2 engineered failures each demonstrating a different lever. Attendees add a 6th of their own in Part C.
 
 ## Engineered failure #1 — "in-force"
 
@@ -33,7 +30,7 @@ conditions when the user asks about in-force, active right now,
 or currently in force.
 ```
 
-**Verify:** Re-run question #6. Should now produce the same result as the expected SQL.
+**Verify:** Re-run question #4. Should now produce the same result as the expected SQL.
 
 ## Engineered failure #2 — agent claims join
 
@@ -55,11 +52,42 @@ ORDER BY claim_count DESC
 LIMIT 10;
 ```
 
-**Verify:** Re-run question #7. Should pass.
+**Verify:** Re-run question #5. Should pass.
 
 ## When to reach for the third lever — *join spec*
 
 You'd reach for join specs when the same two tables can be joined multiple legitimate ways and you want to lock in the default. For our schema, the joins are mostly unambiguous, so we use text instructions and example SQL. Mention this in the discussion; don't force a third failure into the 25-min budget unless you have time.
+
+## Part C — coaching the "add your own benchmark" step
+
+Suggested question for attendees: *"What's our average paid claim amount for property fire losses in 2025?"*
+
+**What you'll likely see Genie generate on a tuned space (Entity matching + Format assistance on):**
+
+```sql
+SELECT AVG(cl.claim_amount_thb) AS avg_paid_thb
+FROM workspace.insurance_data.claims cl
+JOIN workspace.insurance_data.policies p ON p.policy_id = cl.policy_id
+WHERE p.product_subtype = 'property_fire'
+  AND cl.status = 'paid'
+  AND YEAR(cl.settle_date) = 2025;
+```
+
+**Things attendees should check (your coaching prompts):**
+
+1. **Date column** — `YEAR(cl.settle_date) = 2025` or `YEAR(cl.loss_date) = 2025`? Both are defensible; the *insurance* convention is `loss_date` for occurrence-year reporting, `settle_date` for paid-in-year cash reporting. Genie may pick either. Ask attendees: *which would the business expect?*
+2. **Status filter** — `'paid'` lowercase, present, single value? (Format assistance from Ex 1 should make this correct.)
+3. **Population filter** — `product_subtype = 'property_fire'` matches the actual data? (Run `SELECT DISTINCT product_subtype FROM workspace.insurance_data.policies` to confirm.)
+4. **Aggregation** — `AVG(claim_amount_thb)`, not `SUM`, not over the wrong table.
+5. **Currency framing** — output column called `avg_paid_thb` makes the unit explicit. If it's just `avg_amount` that's a minor nit.
+6. **Sanity check the number** — eyeball the result. If you got "23 THB" something is broken; if "5,000,000 THB" it's plausible.
+
+**Common attendee mistakes to catch:**
+- Pasting Genie's SQL into the benchmark without running it themselves.
+- Skipping the sanity check on the result number.
+- Assuming `settle_date` and `loss_date` are interchangeable (they're not — a 2024 loss can be settled in 2025).
+
+If an attendee's question is too judgement-laden (*"who's our best agent?"*), redirect them to a more concrete formulation (*"top 5 agents by paid claim count in 2025"*) — the lesson is that benchmark questions need a deterministic right answer.
 
 ## Common attendee questions
 
