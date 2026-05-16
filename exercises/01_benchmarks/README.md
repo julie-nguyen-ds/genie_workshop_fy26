@@ -34,7 +34,7 @@ We'll fix these failures across the next 3 exercises:
 | Failure pattern | The lever that fixes it | Where you'll learn it |
 |---|---|---|
 | Genie writes `WHERE status = 'Paid'` (uppercase) against lowercase data → returns 0 → expected count mismatch | **Entity matching / Format assistance** (space settings) | **Exercise 2** |
-| Wrong join path or wrong query shape (e.g. claims → agents via a non-existent `agent_id`); inconsistent answer to "claims by loss type" | **SQL trusted asset** (example SQL or UC function) | **Exercise 3** |
+| Wrong join path or wrong query shape (e.g. claims → agents via a non-existent `agent_id`); inconsistent answer to "claims by loss type" | **Example SQL** (parametrized or non-parametrized) | **Exercise 3** |
 | Business term like "in-force" isn't defined — Genie ignores the date window; `text_instructions` blob is bloated and rules compete | **Refactor instructions into atomic + right-typed assets** | **Exercise 4** |
 
 The benchmark is your **regression suite** — at the end of the workshop, re-run it and most/all of the 5 pre-loaded questions plus the 6th you'll add in Part B should pass.
@@ -49,7 +49,7 @@ This is the part that mirrors what you'll do in your own production spaces: **a 
 
 > *Show me total paid claims by loss type for 2025.*
 
-We chose this one on purpose: it's the natural-language counterpart for the SQL function you'll build in Exercise 3 (`claims_by_loss_type`). Right now Genie has no trusted asset for it, so it'll likely get the SQL subtly wrong. Once Ex 3 attaches the function, re-running this benchmark should pass — that's the regression-test loop closing.
+We chose this one on purpose: it's the natural-language counterpart for the **Example SQL** you'll author in Exercise 3 (both a non-parametrized "for 2025" version and a parametrized `:start_date / :end_date` version). Right now Genie has no trusted asset for it, so it'll likely get the SQL subtly wrong. Once Ex 3 attaches the Example SQL, re-running this benchmark should pass — that's the regression-test loop closing.
 
 ### Step 1. Ask Genie to generate the SQL (~1 min)
 
@@ -84,7 +84,7 @@ If Genie's SQL differs from the ground truth, **use the ground truth** as your e
 
 ### Step 4. Re-run the benchmark (~1 min)
 
-You should now see **6 questions** in the benchmark. Click **Run benchmark**. Your new question may pass or fail depending on whether Genie regenerates the same SQL you stored — and that's exactly the gap that Exercise 3 will close by pinning the SQL via a UC function.
+You should now see **6 questions** in the benchmark. Click **Run benchmark**. Your new question may pass or fail depending on whether Genie regenerates the same SQL you stored — and that's exactly the gap that Exercise 3 will close by pinning the SQL via Example SQL (both a hardcoded-2025 version and a parametrized variant).
 
 ---
 

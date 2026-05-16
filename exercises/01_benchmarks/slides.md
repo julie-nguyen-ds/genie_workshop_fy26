@@ -42,7 +42,7 @@ Ask Genie *"Show me total paid claims by loss type for 2025"* in a fresh chat th
 2. Run that SQL in a SQL editor. **Verify** the date column (`loss_date`, not `settle_date`), the `status = 'paid'` filter, the case, the grouping, and **sanity-check** each loss_type's total.
 3. Fix anything wrong; that corrected SQL is your expected SQL.
 4. Add the verified Q+SQL pair via **Benchmark tab → Add question**.
-5. Re-run — this question is the one Ex 3's UC function (`claims_by_loss_type`) will pin later, closing the loop.
+5. Re-run — this question is the one Ex 3's Example SQL will pin later (both a hardcoded-2025 version and a parametrized `:start_date / :end_date` version), closing the loop.
 
 **Never accept Genie's SQL as the expected SQL without checking it yourself** — you'd be grading the test taker against their own answer key.
 

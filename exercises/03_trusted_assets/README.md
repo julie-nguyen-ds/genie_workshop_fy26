@@ -1,181 +1,181 @@
-# Exercise 3 — Create SQL Trusted Assets
+# Exercise 3 — Create SQL Trusted Assets (Example SQL)
 
-**Time:** 25 minutes
-**Goal:** Make Genie's answer render the **Trusted** badge by adding a SQL function and a parameterized example SQL.
+**Time:** ~22 minutes
+**Goal:** Make Genie's answer render the **Trusted** badge by adding two flavors of **Example SQL** to your space — a *non-parametrized* one for a single specific question, and a *parametrized* one that covers a whole family of questions.
+
+> Why Example SQL and not UC SQL functions? UC functions are also valid trusted assets, but the Genie "Add functions" attach dialog currently rejects `DATE` (and `TIMESTAMP`) parameters with *"Parameter start_date has an unsupported type: date"*. Example SQL has no such limitation — `DATE` parameters work fine in the parametrized form. We'll stay with Example SQL throughout this exercise.
 
 ## Why this matters
+
 By default, Genie writes the SQL itself. That's flexible but it's also where hallucinations and subtle aggregation bugs live. **Trusted assets** are pre-vetted SQL that Genie reuses verbatim — when an answer uses one, it gets a *Trusted* badge, signalling to your business users that the math was reviewed by a human.
 
-Two flavors of trusted asset:
-1. **SQL function** — a UC function. Genie can call it; the result is marked Trusted.
-2. **Parameterized example SQL** — a saved query template with `:param` placeholders. Genie substitutes values and runs it verbatim.
-
-You'll add one of each.
+Two flavors of Example SQL today:
+1. **Non-parametrized** — a fixed canonical query for one specific question. Trivial to author; matches one prompt shape only.
+2. **Parametrized** — same idea, but with `:param` placeholders Genie fills in from the user's prompt. Slightly more authoring effort; covers a whole family of questions.
 
 ## Prerequisites
-- The base Genie space (`space_id` shared by facilitator).
+- The base Genie space.
 - `workspace.insurance_data` schema loaded.
+- Entity matching + Format assistance **ON** (you turned these on in Exercise 2).
 
 ---
 
-## Part A — SQL function (~13 min)
+## Part A — Non-parametrized Example SQL (~10 min)
 
-We'll add a function that aggregates claims by loss type over a date range. Before we add anything, let's see *why* we need it.
+We'll add an Example SQL for the **6th benchmark question you added in Ex 1**: *"Show me total paid claims by loss type for 2025"*. Right now this question fails in your benchmark because Genie generates inconsistent SQL each run. We'll pin it.
 
-### Step 1. See the problem first (~3 min)
+### Step 1. See the problem (~2 min)
 
-Open your workshop Genie space. **Without any trusted assets yet**, ask:
+In a fresh chat thread, ask:
 
 > *Show me total paid claims by loss type for 2025.*
 
-When Genie answers, **click "Show SQL"** (or expand the card) to see what it actually wrote. Then ask the **same question 2 more times** in fresh threads.
+Expand the generated SQL. You'll likely see at least one of:
+- `WHERE settle_date BETWEEN ...` instead of `loss_date`
+- Missing `status = 'paid'` filter (sums denied/pending too)
+- Output column renamed across runs (`total_amount` → `paid_total_thb` → `sum_claims`)
+- `ORDER BY` swung between count and amount
 
-You'll likely see at least one of these, varying between runs:
+This is exactly the gap Ex 1 told us Ex 3 would close.
 
-| Problem | What goes wrong | Why it matters |
-|---|---|---|
-| **Wrong date column** | Filters on `report_date` or `settle_date` instead of `loss_date` | A claim reported in 2025 for a 2024 loss gets counted in the wrong year |
-| **Counts unpaid claims as "paid"** | `SUM(claim_amount_thb)` with no `status = 'paid'` filter | Reserves and denied claims inflate the "paid" total |
-| **Drifting column names** | One run says `total_amount`, the next `sum_claims`, the next `claim_total_thb` | Downstream dashboards / exports break; users lose trust |
-| **No currency framing** | Numbers shown with no "THB" anywhere | Business users assume USD |
+### Step 2. Author the non-parametrized Example SQL (~5 min)
 
-**The point:** even a "correct-looking" answer is the wrong primitive when the definition shifts every time someone asks. That's the gap trusted assets close.
-
-### Step 2. Author the function in UC (~5 min)
-
-Open a new SQL query (or use a notebook). Use `starter.sql` as your template, or write your own.
+Open `solution.sql` for the verified version, or compose your own. Either way it should match the `ground_truth.sql` we agreed on in Ex 1 Part B Step 2:
 
 ```sql
-CREATE OR REPLACE FUNCTION
-  workspace.insurance_data.claims_by_loss_type(
-    start_date DATE COMMENT 'Inclusive start of the loss date window',
-    end_date DATE COMMENT 'Inclusive end of the loss date window'
-  )
-  RETURNS TABLE (loss_type STRING, claim_count BIGINT, total_paid_thb BIGINT)
-  COMMENT 'Aggregate claims by loss_type for losses occurring between start_date and end_date.'
-  RETURN
-    SELECT
-      loss_type,
-      COUNT(*) AS claim_count,
-      COALESCE(SUM(CASE WHEN status = 'paid' THEN claim_amount_thb END), 0) AS total_paid_thb
-    FROM workspace.insurance_data.claims
-    WHERE loss_date BETWEEN start_date AND end_date
-    GROUP BY loss_type
-    ORDER BY claim_count DESC;
+-- Question: Show me total paid claims by loss type for 2025
+SELECT
+  loss_type,
+  COUNT(*) AS claim_count,
+  COALESCE(SUM(CASE WHEN status = 'paid' THEN claim_amount_thb END), 0) AS total_paid_thb
+FROM workspace.insurance_data.claims
+WHERE loss_date BETWEEN DATE'2025-01-01' AND DATE'2025-12-31'
+GROUP BY loss_type
+ORDER BY claim_count DESC;
 ```
 
-Notice the function bakes in every fix from the table above: `loss_date` (not `report_date`), `status = 'paid'` filter, stable column names (`claim_count`, `total_paid_thb`), `_thb` suffix making the currency unambiguous.
+Notice this query bakes in every fix from Ex 1's ground truth: `loss_date` (not `settle_date`), `status = 'paid'` filter, stable column names, `_thb` suffix on the currency column.
 
-Run it. Test it standalone:
-```sql
-SELECT * FROM workspace.insurance_data.claims_by_loss_type(DATE'2025-01-01', DATE'2025-12-31');
-```
+### Step 3. Attach as Example SQL on the Genie space (~2 min)
 
-### Step 3. Attach the function to the Genie space (~2 min)
 1. Open the workshop Genie space.
-2. Right rail → **Functions** → **Add functions**.
-3. Search for `claims_by_loss_type` and add it.
-4. When prompted, fill in the two fields shown in the attach dialog:
-
-   - **Sample question:**
-     > *Show me total paid claims by loss type for 2025.*
-
-   - **Usage guidance** (list the *phrasings* that should hit this function, not just what it does — Genie matches user prompts against these examples semantically):
+2. Right rail → **Example SQL queries** → **Add**.
+3. Paste the SQL above.
+4. Fill in the metadata:
+   - **Question:** *Show me total paid claims by loss type for 2025*
+   - **Usage guidance:** list paraphrases that should hit this exact query (it only handles 2025 — don't widen the net beyond that year):
      ```
-     Call this function whenever the user asks for claims grouped by loss_type
-     over a date range. The function filters on loss_date and only sums claims
-     where status = 'paid'.
-
-     Phrasings that should all trigger this function:
+     Use this exact query for any 2025-scoped question about paid claims grouped
+     by loss_type. Phrasings that should match:
        • "Show me total paid claims by loss type for 2025"
        • "Paid claims by loss_type in 2025"
-       • "Claims broken down by loss type, January 2025"
-       • "Loss type distribution of paid claims this year"
-       • "What's our paid claim total per loss type for Q1 2026?"
-       • "How much have we paid out by loss type last month?"
-       • "Top loss types by paid claim amount in 2025"
-       • "Breakdown of claims by type of loss for 2025"
+       • "Breakdown of paid claims by type of loss for 2025"
+       • "Loss type distribution of paid claims for 2025"
 
-     Map the user's time window to start_date / end_date:
-       • "2025"           → DATE'2025-01-01', DATE'2025-12-31'
-       • "January 2025"   → DATE'2025-01-01', DATE'2025-01-31'
-       • "Q1 2026"        → DATE'2026-01-01', DATE'2026-03-31'
-       • "last month"     → first and last day of the previous calendar month
-       • "year-to-date"   → DATE'YYYY-01-01' through current_date()
-
-     Do NOT call this function for:
-       • Claims grouped by something other than loss_type (status, branch, agent)
-       • Questions about open / pending / denied claims (function only sums paid)
-       • Filtered further by product_line or product_subtype (write a custom query)
+     Do NOT use this query for any year other than 2025 — use the parametrized
+     version below instead.
      ```
+5. Save.
 
-**Why both fields, and why list phrasings?** The function's UC `COMMENT` is for humans browsing the catalog — Genie's planner doesn't lean on it much. The **sample question** and **usage guidance** are what Genie actually reads when deciding *whether* to call the function for a user prompt:
+### Step 4. Re-ask and compare (~1 min)
 
-- The sample question pins a single canonical phrasing.
-- The usage guidance widens the net. Users won't say the canonical phrase verbatim — they'll say *"breakdown of claims by type of loss"*, *"paid loss-type totals last month"*, *"how much have we paid per loss type"*. By listing those paraphrases explicitly, you give Genie's semantic matcher concrete anchors to score against — and you also list **what NOT to do** so Genie doesn't mis-fire on adjacent-but-different questions (e.g. *"claims by status"* — wrong grouping; *"open claims by loss type"* — wrong status filter).
-
-Skip these two fields and Genie sees only the signature + return type. It'll still work *sometimes*, but you'll lose the Trusted badge any time a user phrases their question even slightly differently.
-
-### Step 4. Re-ask and compare (~3 min)
-
-In a fresh thread, ask the **same question** as Step 1:
-
+In a fresh thread, ask:
 > *Show me total paid claims by loss type for 2025.*
 
-Now check, and compare against your Step 1 runs:
-- ✅ **Trusted** badge appears on the response card — Genie called your function instead of writing its own SQL.
-- ✅ Columns are `loss_type`, `claim_count`, `total_paid_thb` — same every time.
-- ✅ `total_paid_thb` only includes `status = 'paid'` claims.
-- ✅ The `_thb` suffix makes the currency unambiguous.
-
-Ask it 2 more times. The answer is now identical across runs. **That repeatability is what trusted assets buy you.**
+You should now see the **Trusted** badge and the exact SQL from Step 2. Re-run the Ex 1 benchmark — your 6th question (the one you added) should now pass deterministically.
 
 ---
 
-## Part B — Parameterized example SQL (~10 min)
+## Part B — Parametrized Example SQL (~10 min)
 
-> Optional warm-up: before adding the example SQL below, try asking Genie *"Who are the top 5 agents by claim count in Phuket?"* and look at the SQL it generates. The `claims` table has no `agent_id`, so Genie often errors out or invents the wrong join path. Same lesson as Part A — query shapes also need to be pinned.
+The non-parametrized query above only works for 2025. As soon as a user asks about 2024 or *"last quarter"*, Genie has to generate its own SQL again. **Parametrized example SQL** generalizes — same query shape, `:param` placeholders Genie fills in from the user's prompt.
 
-Now the second flavor: an example SQL with a `:province` parameter.
-
-### Step 1. Add the example SQL
-In the space, right rail → **Example SQL queries** → **Add**.
+### Step 1. Author the parametrized Example SQL (~5 min)
 
 ```sql
--- Question: Top 5 agents by claim count in :province
+-- Question: Total paid claims by loss type between :start_date and :end_date
 SELECT
-  a.agent_id,
-  a.agent_name,
-  COUNT(cl.claim_id) AS claim_count
-FROM workspace.insurance_data.agents a
-JOIN workspace.insurance_data.policies p ON p.agent_id = a.agent_id
-JOIN workspace.insurance_data.claims cl ON cl.policy_id = p.policy_id
-JOIN workspace.insurance_data.branches b ON b.branch_id = a.branch_id
-WHERE b.province = :province
-GROUP BY a.agent_id, a.agent_name
-ORDER BY claim_count DESC
-LIMIT 5;
+  loss_type,
+  COUNT(*) AS claim_count,
+  COALESCE(SUM(CASE WHEN status = 'paid' THEN claim_amount_thb END), 0) AS total_paid_thb
+FROM workspace.insurance_data.claims
+WHERE loss_date BETWEEN :start_date AND :end_date
+GROUP BY loss_type
+ORDER BY claim_count DESC;
 ```
 
-Mark `:province` as a parameter; sample value `Bangkok`.
+Same body, but the literal date range is replaced with `:start_date` and `:end_date`.
 
-### Step 2. Ask Genie
-> *Who are the top 5 agents by claim count in Phuket?*
+### Step 2. Attach as Example SQL with parameter metadata (~3 min)
 
-Expected: Genie reuses your example SQL with `:province = 'Phuket'`. **Trusted** badge.
+1. Right rail → **Example SQL queries** → **Add**.
+2. Paste the SQL.
+3. Fill in the metadata:
+   - **Question:** *Total paid claims by loss type between two dates*
+   - **Parameters:**
+     - `:start_date` — type **DATE**, sample value `2025-01-01`, description: *"Inclusive start of the loss date window. ISO format YYYY-MM-DD."*
+     - `:end_date` — type **DATE**, sample value `2025-12-31`, description: *"Inclusive end of the loss date window. ISO format YYYY-MM-DD."*
+   - **Usage guidance:**
+     ```
+     Use this query whenever the user asks for paid claims grouped by loss_type
+     over a date range OTHER than 2025 (the fixed 2025 version above handles that
+     specific year). Phrasings that should match:
+       • "Paid claims by loss type for 2024"
+       • "Loss type breakdown of paid claims in Q1 2026"
+       • "Paid claims by loss_type last month"
+       • "What did we pay out by loss type from March to August 2024?"
+
+     Map the user's time window to :start_date and :end_date:
+       • "2024"           → '2024-01-01', '2024-12-31'
+       • "Q1 2026"        → '2026-01-01', '2026-03-31'
+       • "January 2025"   → '2025-01-01', '2025-01-31'
+       • "last month"     → first and last day of the previous calendar month
+       • "year-to-date"   → 'YYYY-01-01' through today
+
+     Do NOT use this query for: claims grouped by something other than loss_type
+     (status, branch, agent); open/pending/denied claims (filter is paid-only).
+     ```
+4. Save.
+
+### Step 3. Test (~2 min)
+
+Ask Genie:
+> *Loss type breakdown of paid claims for Q1 2026.*
+
+Expand the SQL — should be the parametrized template with `:start_date = '2026-01-01'`, `:end_date = '2026-03-31'`. **Trusted** badge appears.
+
+Try one more:
+> *Paid claims by loss type in 2024.*
+
+Should also use the parametrized version with `'2024-01-01'`, `'2024-12-31'`.
 
 ---
 
-## Discussion (~3 min)
-- **What you saw in Step 1 of Part A** is the default Genie behavior at scale — the same business question gets a slightly different answer every time because the underlying SQL is regenerated. Trusted assets pin the answer.
-- **When SQL function vs example SQL?** Function = reusable across many questions, lives in UC, callable from anywhere. Example SQL = scoped to this space, more flexible (joins, CTEs, parameters), faster to author.
-- **What if the user asks something slightly different?** Genie may decide your trusted asset doesn't fit and write its own SQL — then the badge won't appear. That's expected; trusted assets aren't a guarantee they'll always be used.
-- **Discoverability for users.** Show attendees how to see the function/example SQL in the right rail of the space.
+## Discussion (~2 min)
+
+**Non-parametrized vs parametrized — when to use which?**
+
+| | Non-parametrized | Parametrized |
+|---|---|---|
+| Authoring effort | Minimal — paste the SQL, name the question | Slightly more — define each param's type, sample, description |
+| Question coverage | One specific prompt shape only | A whole family of prompts sharing one SQL shape |
+| Genie matching | Easy — semantic match on the question text | Slightly harder — Genie has to extract values from the user's prompt |
+| When to reach for it | Marquee questions executives ask verbatim every Monday; questions where you absolutely cannot afford SQL drift | Common question shapes with varying filters (date ranges, regions, product lines) |
+
+**Heuristic:** if you'd write `"for $year"`/`"for $month"`/`"in $branch"` in the question, parametrize. If the question always uses the exact same literal value (and you want a bulletproof match on that one phrasing), non-parametrize.
+
+**Combining them.** Both can coexist on the same space. Genie will pick whichever matches better. Use a non-param for the "executive favorite" version of a recurring query, plus a parametrized version that covers everything else.
+
+---
 
 ## Done when
-- [ ] Function `claims_by_loss_type` exists in UC and is attached to the space.
-- [ ] Example SQL "Top 5 agents by claim count in :province" is saved on the space.
-- [ ] At least one of your test prompts produces an answer with the **Trusted** badge.
+- [ ] Non-parametrized Example SQL for "total paid claims by loss type for 2025" exists on the space; the corresponding chat prompt returns a **Trusted** badge.
+- [ ] Parametrized Example SQL with `:start_date` / `:end_date` exists on the space; a non-2025 date question returns a **Trusted** badge with the params correctly filled.
+- [ ] Re-run the Ex 1 benchmark — your user-added 6th question (claims by loss type for 2025) now passes.
+- [ ] You can explain when to choose each flavor.
 
 ## If you finish early
-Add a second SQL function: `premium_by_branch(year INT)` returning total premium written by branch for a given year. Attach it. Ask Genie for "total premium by branch in 2025".
+- Add a parametrized example SQL for *"Top N agents by claim count in `:province`"* with `:province` as a STRING parameter. Ask Genie *"who are the top 5 agents by claim count in Phuket?"*.
+- Add a non-parametrized example SQL that pins the join shape from Ex 1 benchmark #5 (top 10 agents by claim count + branch — the question `claims` has no `agent_id` problem). After adding it, re-run that benchmark — should pass.
+
+See `solution.sql` for paste-ready versions of both flavors.

@@ -12,18 +12,18 @@ This is the deep-dive cheat sheet for the live walk-through portion of Exercise 
 | 2 | How many claims paid in 2025? | Genie may write `status = 'Paid'` (uppercase) → 0 rows | **Ex 2** Entity matching |
 | 3 | Total claim amount by loss type, motor only, 2025 | Similar — `product_line = 'Motor'` case mismatch; sometimes wrong date column | **Ex 2** Entity matching |
 | 4 | **Which branch has the most active in-force policies right now?** | Genie reads "active" as `status = 'active'` only — ignores the date window. "In-force" is insurance jargon Genie doesn't know. | **Ex 4** — when attendees refactor the oversized instruction blob, the "in-force" atomic text instruction gets extracted (the bloated blob already contains the definition) |
-| 5 | **Top 10 agents by claim count + branch** | `claims` table has no `agent_id` — the join must traverse `claims → policies → agents`. Genie often errors or invents a wrong path. | **Ex 3** — parameterised example SQL pinning the canonical 4-way join |
+| 5 | **Top 10 agents by claim count + branch** | `claims` table has no `agent_id` — the join must traverse `claims → policies → agents`. Genie often errors or invents a wrong path. | **Ex 3** — Example SQL (either non-parametrized for the canonical "top 10 + branch" prompt, or parametrized as "top N agents by claim count in `:province`") |
 
 3 easy/moderate to set the baseline (#1-3) + 2 engineered failures previewing different fixes (#4-5).
 
-**Attendees add a 6th question themselves in Part B** — and that 6th is mandated, not free choice: *"Show me total paid claims by loss type for 2025"*. This is the natural-language counterpart for the UC SQL function (`claims_by_loss_type`) attendees will build in Ex 3. Adding it here closes the loop: Ex 3's function pins the SQL, the benchmark then passes consistently on re-run.
+**Attendees add a 6th question themselves in Part B** — and that 6th is mandated, not free choice: *"Show me total paid claims by loss type for 2025"*. This is the natural-language counterpart for the Example SQL attendees will author in Ex 3 (both a non-parametrized "for 2025" and a parametrized `:start_date / :end_date` version). Adding it here closes the loop: Ex 3's Example SQL pins the SQL, the benchmark then passes consistently on re-run.
 
 ## What each later exercise fixes (live re-run guidance)
 
 After each later exercise, you *could* re-run the benchmark to demonstrate the score improving. We don't budget for this inside the exercises (it adds 2-3 min each), but the very end of the workshop is a great moment to re-run all 6 and show the difference vs the baseline.
 
 - After **Ex 2** (Entity matching ON): #1, #2, #3 should pass — case mismatch fixed.
-- After **Ex 3** (trusted assets added): #5 should pass, and the **user-added 6th question** ("total paid claims by loss type for 2025") should also pass since the new UC function pins its SQL.
+- After **Ex 3** (trusted assets added — Example SQL): #5 should pass (via parametrized example SQL pinning the join shape), and the **user-added 6th question** ("total paid claims by loss type for 2025") should also pass since the non-parametrized Example SQL pins its SQL.
 - After **Ex 4** (instruction refactor — atomic in-force instruction extracted from the bloated blob): #4 should pass.
 
 If a question still fails after the "right" exercise, it's a coaching moment: dig into the generated SQL and figure out the residual gap.
@@ -81,7 +81,7 @@ Quick reference for the diff:
 - Confusing `settle_date` and `loss_date`.
 - Counting unpaid claims in the "total paid" sum.
 
-**The point of this question being mandated:** it's the natural-language counterpart for the `claims_by_loss_type` SQL function attendees will build in Ex 3. By the end of the workshop, when the function is attached, Genie should call it and produce exactly this SQL deterministically — the benchmark pass becomes proof that Ex 3's work landed.
+**The point of this question being mandated:** it's the natural-language counterpart for the Example SQL attendees will author in Ex 3. By the end of the workshop, when the non-parametrized Example SQL is attached, Genie will reuse it verbatim — the benchmark pass becomes proof that Ex 3's work landed.
 
 ## Common attendee questions
 
