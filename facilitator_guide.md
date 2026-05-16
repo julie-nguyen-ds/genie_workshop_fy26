@@ -5,7 +5,7 @@
 | min | what you do | watch for |
 |---|---|---|
 | 0–10 | Intro slides: three asset types (text instructions, example SQL, SQL functions, sql_snippets), what each is for | Don't let intro slip past 10. The doing is the value. |
-| 10–35 | **Ex 1 — Trusted assets.** Walk through `exercises/01_trusted_assets/README.md`. Demo the **Trusted** badge live first, then let attendees do their own. | Some attendees will spend too long perfecting their SQL function. Time-box: if they don't have a working function at 0:25, give them the `solution.sql`. |
+| 10–35 | **Ex 1 — Trusted assets.** Walk through `exercises/01_trusted_assets/README.md`. **First do the "see the problem" step live** — ask Genie "show me total paid claims by loss type for 2025" 2–3 times in fresh threads, expand the SQL, and point at the inconsistencies (wrong date column, unpaid claims included, drifting column names, no THB framing). Then let attendees author the function. Demo the Trusted badge yourself on the after side. | Some attendees will spend too long perfecting their SQL function. Time-box: if they don't have a working function at 0:25, give them the `solution.sql`. The "before" demo is the most important teaching moment of Ex 1 — don't skip it. |
 | 35–60 | **Ex 2 — Benchmarks.** Each attendee imports `benchmark_questions.csv`, runs benchmark, looks at scores. Walk the room while it runs (~2–3 min). Then walk through the 2 failures together. | Benchmark runs are async; don't let them sit silently waiting. Use the runtime to talk through the 3 tuning levers. |
 | 60–85 | **Ex 3 — Fix oversized instructions.** Share the broken `space_id` you pre-seeded. Attendees open it, hit the wall, refactor. | This one frustrates people — that's the point. After 10 min if folks are stuck, do the refactor live and let them follow. |
 | 85–110 | **Ex 4 — Glossary.** Encode `loss_ratio`, `earned_premium`, "in-force", "severity vs frequency". Test with prompts. | Drift risk: attendees want to add 20 terms. Time-box to 4 terms. |
@@ -30,6 +30,7 @@
 ## Common pitfalls
 
 - **"My Genie answer says 'Verified' not 'Trusted'."** Verified means a human reviewed it; Trusted means it used the *exact text* of a parameterized example SQL or SQL function. Different concept. Show the docs.
+- **Ex 1 "before" step — Genie answers look correct.** Sometimes Genie *does* pick `loss_date` and filter `status = 'paid'` on the first run. The repeatability angle still holds: ask 2–3 times and point at column-name drift (`total_amount` → `paid_total_thb` → `sum_claims`). If even the column names are stable, fall back to the conceptual framing: *"you got lucky this time; on a different day or schema, the same prompt could quietly produce different SQL."*
 - **"The benchmark scorer says my answer is wrong but it looks right."** Benchmark compares result *sets*. Order matters if you didn't `ORDER BY` consistently. Column aliases matter. This is a teaching moment.
 - **"I made the instruction shorter and it still doesn't work."** Length isn't the only issue — Genie weights instructions; too many compete. Re-read Ex 3 takeaways.
 - **THB currency in queries** — Genie may default to USD framing. Add an instruction: "All monetary columns are in THB."
