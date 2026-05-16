@@ -1,6 +1,6 @@
 # The bloated `text_instructions` blob (input)
 
-This is what the broken space contains in a **single** `text_instructions` entry.
+This is what the training space contains in a **single** `text_instructions` entry.
 It's intentionally over-stuffed: glossary, business rules, SQL fragments, table descriptions,
 and a redundant FAQ — all crammed into one giant string. Total length is well past
 the per-instruction character cap.

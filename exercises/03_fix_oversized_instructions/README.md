@@ -14,14 +14,14 @@ The right places are:
 - *Not in instructions at all* → sample questions on the space; conversation-time clarifications
 
 ## Prerequisites
-- The **broken space** `space_id` shared by your facilitator (they ran `seed_broken_space.py` ahead of time).
+- The **instruction-fix training space** `space_id` shared by your facilitator (they ran `create_training_space.py` ahead of time — this space has its `text_instructions` set to a single oversized blob, which is what you'll refactor).
 - 25 minutes of patience.
 
 ---
 
-## Step 1 — Open the broken space and see what's wrong (~5 min)
+## Step 1 — Open the training space and see what's wrong (~5 min)
 
-1. Open the broken Genie space.
+1. Open the instruction-fix training Genie space.
 2. Click **Instructions** in the right rail.
 3. You'll see **one** `text_instructions` entry containing a 3,800-character blob. Read it. Resist the urge to fix it in place.
 4. Try asking Genie:

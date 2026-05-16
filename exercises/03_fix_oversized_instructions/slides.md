@@ -38,7 +38,7 @@ The fix is **routing each piece to the right asset type**:
 ---
 
 ## Slide 4 — The refactor (live)
-You'll open the broken space, then:
+You'll open the training space (oversized single-instruction blob), then:
 1. Split the monster into **9 atomic `text_instructions`**.
 2. Promote loss ratio + earned premium to **`sql_snippets`**.
 3. Promote canonical joins to **`example_question_sqls`**.

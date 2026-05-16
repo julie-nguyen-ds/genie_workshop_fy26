@@ -1,13 +1,13 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC # Seed the Broken Genie Space — Exercise 3
+# MAGIC # Create the Instruction-Fix Training Genie Space — Exercise 3
 # MAGIC
-# MAGIC Creates a Genie space whose `text_instructions` is a single monster
-# MAGIC blob — glossary + table descriptions + SQL fragments + FAQ all crammed
-# MAGIC together, well past the per-instruction character cap. Attendees
-# MAGIC refactor it during Exercise 3.
+# MAGIC Creates a Genie space whose `text_instructions` is one oversized blob
+# MAGIC — glossary + table descriptions + SQL fragments + FAQ all crammed
+# MAGIC into a single entry, well past the per-instruction character cap.
+# MAGIC Attendees refactor it into atomic, right-typed assets during Exercise 3.
 # MAGIC
-# MAGIC **Facilitator: run BEFORE the session and share the resulting
+# MAGIC **Facilitator: run this BEFORE the session and share the resulting
 # MAGIC `space_id` with attendees just before Exercise 3.**
 # MAGIC
 # MAGIC **Auth:** picked up from the notebook context — no env vars or PAT.
@@ -121,7 +121,7 @@ print("(Per-instruction caps are typically a few thousand characters — this is
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Build the (intentionally broken) serialized space
+# MAGIC ## Build the serialized space with the oversized instruction blob
 
 # COMMAND ----------
 
@@ -152,13 +152,13 @@ serialized_space = json.dumps({
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Create the broken space
+# MAGIC ## Create the training space
 
 # COMMAND ----------
 
 result = api("POST", "/api/2.0/genie/spaces", {
-    "description": "Thai P&C — Genie Workshop Exercise 3 (BROKEN: oversized instructions, do not use as a reference)",
-    "title": "Thai P&C — Ex 3 BROKEN",
+    "description": "Thai P&C — Genie Workshop Exercise 3 — instruction-size fix training space",
+    "title": "Thai P&C — Ex 3 Instruction Fix",
     "parent_path": PARENT_PATH,
     "warehouse_id": warehouse_id,
     "serialized_space": serialized_space,
