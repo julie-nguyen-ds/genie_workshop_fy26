@@ -21,7 +21,7 @@ Analytics / BI engineers and SAs who will own a Genie space day-to-day. Attendee
 Per attendee:
 - A Databricks workspace with **Genie enabled** (AI/BI Genie entitlement on Premium+).
 - A **SQL warehouse** (Serverless preferred) you can attach to a space.
-- Write access to Unity Catalog with `CREATE CATALOG` (the setup creates a `genie_workshop` catalog with an `insurance_data` schema).
+- Write access to a Unity Catalog catalog where the workshop schema will be created (default: `main.insurance_data`).
 - A Databricks PAT (personal access token) for Exercise 3's API-driven space creation.
 
 For the facilitator:
@@ -32,7 +32,7 @@ For the facilitator:
 1. **Load the sample data**
    ```sql
    -- Open setup/00_load_data.sql in a notebook or SQL editor and run.
-   -- Creates genie_workshop.insurance_data.{customers, policies, claims, agents, branches}
+   -- Creates main.insurance_data.{customers, policies, claims, agents, branches}
    ```
 
 2. **Create the base Genie space** (used by Exercises 1, 2, 4)

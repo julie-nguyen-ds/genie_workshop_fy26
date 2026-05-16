@@ -19,7 +19,7 @@ import sys
 import urllib.request
 import urllib.error
 
-CATALOG = "genie_workshop"
+CATALOG = "main"
 SCHEMA = "insurance_data"
 TABLES = ["customers", "branches", "agents", "policies", "claims"]
 

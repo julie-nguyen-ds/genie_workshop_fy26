@@ -41,8 +41,8 @@ The exact assets to add to your space.
 ### "What was our motor loss ratio in 2025?"
 ```sql
 SELECT SUM(cl.claim_amount_thb) / NULLIF(SUM(p.annual_premium_thb), 0) AS loss_ratio_2025
-FROM genie_workshop.insurance_data.policies p
-LEFT JOIN genie_workshop.insurance_data.claims cl ON cl.policy_id = p.policy_id
+FROM main.insurance_data.policies p
+LEFT JOIN main.insurance_data.claims cl ON cl.policy_id = p.policy_id
 WHERE p.product_line = 'motor'
   AND YEAR(p.effective_date) = 2025;
 ```
@@ -50,9 +50,9 @@ WHERE p.product_line = 'motor'
 ### "How many policies are in-force right now by region?"
 ```sql
 SELECT b.region, COUNT(*) AS in_force_count
-FROM genie_workshop.insurance_data.policies p
-JOIN genie_workshop.insurance_data.agents a ON a.agent_id = p.agent_id
-JOIN genie_workshop.insurance_data.branches b ON b.branch_id = a.branch_id
+FROM main.insurance_data.policies p
+JOIN main.insurance_data.agents a ON a.agent_id = p.agent_id
+JOIN main.insurance_data.branches b ON b.branch_id = a.branch_id
 WHERE p.status = 'active'
   AND p.effective_date <= current_date()
   AND p.expiry_date >= current_date()
@@ -63,8 +63,8 @@ ORDER BY in_force_count DESC;
 ### "What's our claim severity for property fire claims?"
 ```sql
 SELECT AVG(cl.claim_amount_thb) AS claim_severity_thb
-FROM genie_workshop.insurance_data.claims cl
-JOIN genie_workshop.insurance_data.policies p ON p.policy_id = cl.policy_id
+FROM main.insurance_data.claims cl
+JOIN main.insurance_data.policies p ON p.policy_id = cl.policy_id
 WHERE p.product_subtype = 'property_fire';
 ```
 
@@ -76,5 +76,5 @@ SELECT SUM(
                         DATEDIFF(expiry_date, effective_date)))
     / NULLIF(DATEDIFF(expiry_date, effective_date), 0)
 ) AS total_earned_premium_thb
-FROM genie_workshop.insurance_data.policies;
+FROM main.insurance_data.policies;
 ```

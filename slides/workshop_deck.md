@@ -53,7 +53,7 @@ Synthetic Thai P&C insurer:
 - `policies` (~10,000) — motor + property
 - `claims` (~5,000) — with ~3% fraud-flagged
 
-All in `genie_workshop.insurance_data`. Sample data is already loaded for you.
+All in `main.insurance_data`. Sample data is already loaded for you.
 
 ---
 
