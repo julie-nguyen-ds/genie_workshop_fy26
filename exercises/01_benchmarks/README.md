@@ -62,29 +62,17 @@ Expand the answer card → **Show generated SQL**. Copy that SQL to your clipboa
 
 This is the critical step. Open a SQL editor tab (or the Databricks SQL Editor), paste Genie's SQL, run it, and look at the result.
 
-Then walk through this checklist:
+The **ground truth** for this question lives in [`ground_truth.sql`](ground_truth.sql) — open it side-by-side with Genie's output. Diff the two and walk through the five things Genie typically gets wrong on this question:
 
-- **Date column** — for "2025", did Genie use `YEAR(loss_date) = 2025` (the insurance convention — date the loss occurred), or `settle_date` / `report_date` (different semantics)? For "claims in 2025" we want `loss_date`.
-- **"Paid" filter** — does the SQL include `status = 'paid'`, or did Genie sum everything regardless of status? Total paid by loss type should only include paid claims.
-- **Case sensitivity** — does it say `'paid'` (lowercase, matches the data) or `'Paid'`? Run `SELECT DISTINCT status FROM workspace.insurance_data.claims` to confirm.
-- **Groupings** — `GROUP BY loss_type`, returning one row per loss_type.
-- **Column shape** — at minimum a `loss_type` and a paid total in THB. Bonus if Genie also returns a `claim_count`.
-- **Sanity-check the number** — eyeball each loss_type's total. If "fire" comes out to 23 THB or 10^12 THB, something is broken. A plausible total for a Thai P&C insurer's annual fire claims is in the millions to tens-of-millions of THB.
+1. **Date column** — Genie usually filters on `settle_date`. The ground truth filters on `loss_date` (claims that *occurred* in 2025, not ones *settled* in 2025).
+2. **Paid filter** — Genie doesn't filter for paid claims. The ground truth filters `status = 'paid'`, so unpaid/denied/pending claims don't inflate the total.
+3. **Missing `claim_count`** — Genie typically only returns `total_paid_claims_thb`. The ground truth returns both `claim_count` and `total_paid_thb` per loss type.
+4. **No `COALESCE` + `CASE`** — Genie aggregates with a plain `SUM`. The ground truth wraps the paid-only sum in `CASE WHEN status = 'paid' THEN claim_amount_thb END` and `COALESCE(..., 0)` so loss types with zero paid claims still show a row with `0` instead of `NULL`.
+5. **Order** — Genie orders by `total_paid_claims_thb DESC`. The ground truth orders by `claim_count DESC` (most-frequent loss types first, regardless of THB magnitude).
 
-A reasonable verified expected SQL looks like:
+Also sanity-check the casing (`'paid'` lowercase vs `'Paid'`) and eyeball the per-loss_type numbers — if "fire" comes out to 23 THB or 10^12 THB, something is broken.
 
-```sql
-SELECT
-  loss_type,
-  COUNT(*) AS claim_count,
-  COALESCE(SUM(CASE WHEN status = 'paid' THEN claim_amount_thb END), 0) AS total_paid_thb
-FROM workspace.insurance_data.claims
-WHERE loss_date BETWEEN DATE'2025-01-01' AND DATE'2025-12-31'
-GROUP BY loss_type
-ORDER BY claim_count DESC;
-```
-
-If Genie's SQL is **wrong**, rewrite it — that corrected SQL is your expected SQL. If it's **right**, use it as-is. Either way, **you ran it and verified the number yourself** before promoting it to the benchmark.
+If Genie's SQL differs from the ground truth, **use the ground truth** as your expected SQL. **You ran it and verified the number yourself** before promoting it to the benchmark.
 
 ### Step 3. Add the question to the benchmark (~1 min)
 

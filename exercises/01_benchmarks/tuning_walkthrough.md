@@ -57,17 +57,14 @@ WHERE status = 'paid' AND loss_date BETWEEN '2025-01-01' AND '2025-12-31'
 GROUP BY loss_type;
 ```
 
-The "verified expected SQL" we want attendees to land on:
-```sql
-SELECT
-  loss_type,
-  COUNT(*) AS claim_count,
-  COALESCE(SUM(CASE WHEN status = 'paid' THEN claim_amount_thb END), 0) AS total_paid_thb
-FROM workspace.insurance_data.claims
-WHERE loss_date BETWEEN DATE'2025-01-01' AND DATE'2025-12-31'
-GROUP BY loss_type
-ORDER BY claim_count DESC;
-```
+The "verified expected SQL" we want attendees to land on is in [`ground_truth.sql`](ground_truth.sql), with the five typical Genie-vs-ground-truth differences listed inline in the SQL comment header. Open that file alongside Genie's generated SQL when coaching attendees through the diff.
+
+Quick reference for the diff:
+1. Genie filters on `settle_date`; ground truth filters on `loss_date`.
+2. Genie omits the `status = 'paid'` filter; ground truth includes it.
+3. Genie typically returns only `total_paid_claims_thb`; ground truth returns both `claim_count` and `total_paid_thb`.
+4. Genie uses a plain `SUM`; ground truth wraps with `COALESCE(SUM(CASE WHEN status = 'paid' THEN claim_amount_thb END), 0)`.
+5. Genie orders by the total amount; ground truth orders by `claim_count DESC`.
 
 **Coaching prompts to walk attendees through:**
 
