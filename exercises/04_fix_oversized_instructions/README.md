@@ -1,4 +1,4 @@
-# Exercise 3 — Fix Oversized Instructions
+# Exercise 4 — Fix Oversized Instructions
 
 **Time:** 25 minutes
 **Goal:** Open a Genie space whose instructions are a single oversized blob, and refactor it into the *right* asset types.

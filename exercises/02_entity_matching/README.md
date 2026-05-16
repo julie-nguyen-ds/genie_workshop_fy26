@@ -96,7 +96,7 @@ Now `WHERE product_line = 'motor' AND status = 'active'` — both lowercase, rea
 ## Discussion (~2 min)
 
 - **Why isn't this on by default?** Sampling values has a context-token cost. On a 5-table schema with low-cardinality enums it's cheap. On a warehouse with hundreds of tables and high-cardinality columns (millions of customer IDs), indexing every distinct value would blow up the planner's context. Picking when to enable it is a per-space decision.
-- **Entity matching ≠ synonyms.** It maps spelling/case variants of the *same* word to the canonical value. It will **not** equate `"motor"` with `"auto"` or `"vehicle"` — those are domain synonyms and live in text instructions (Exercise 4) or as example SQL queries.
+- **Entity matching ≠ synonyms.** It maps spelling/case variants of the *same* word to the canonical value. It will **not** equate `"motor"` with `"auto"` or `"vehicle"` — those are domain synonyms and live in text instructions (Exercise 4) or as example SQL queries (Exercise 3).
 - **Where else does this break in our dataset?**
   - Province names (`"Phuket"` vs `"phuket"` — actually mixed-case in our data, watch for this)
   - Adjuster names with Thai diacritics

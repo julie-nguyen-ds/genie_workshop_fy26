@@ -1,4 +1,4 @@
-# Exercise 3 — Refactored Solution
+# Exercise 4 — Refactored Solution
 
 The bloated single-instruction blob from `bloated_instructions.md` gets split across
 the **right** asset types. This is the destination state.

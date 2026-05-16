@@ -5,17 +5,16 @@ A 2-hour hands-on workshop teaching analytics teams how to **build and operate**
 ## Audience
 Analytics / BI engineers and SAs who will own a Genie space day-to-day. Attendees should already have a Databricks workspace with Genie enabled and a SQL warehouse they can attach to a space.
 
-## Agenda (~2h05m)
+## Agenda (~1h45m)
 
 | Time | Segment |
 |---|---|
 | 0:00 – 0:10 | Intro — what makes a good Genie space (3 asset types) |
 | 0:10 – 0:25 | **Exercise 1** — Benchmarks: run + add your own (sets the baseline; no tuning here) |
 | 0:25 – 0:37 | **Exercise 2** — Entity matching & format assistance (fix the silent-zero) |
-| 0:37 – 1:02 | **Exercise 3** — Fix oversized instructions |
-| 1:02 – 1:27 | **Exercise 4** — Business glossary & general instructions |
-| 1:27 – 1:55 | **Exercise 5** — Create SQL trusted assets |
-| 1:55 – 2:05 | Wrap — re-run the benchmark; checklist for shipping a production Genie space |
+| 0:37 – 1:05 | **Exercise 3** — Create SQL trusted assets |
+| 1:05 – 1:30 | **Exercise 4** — Fix oversized instructions |
+| 1:30 – 1:45 | Wrap — re-run the benchmark; checklist for shipping a production Genie space |
 
 ## Prereqs
 
@@ -23,10 +22,10 @@ Per attendee:
 - A Databricks workspace with **Genie enabled** (AI/BI Genie entitlement on Premium+).
 - A **SQL warehouse** (Serverless preferred) you can attach to a space.
 - Write access to a Unity Catalog catalog where the workshop schema will be created (default: `workspace.insurance_data` — `workspace` is the default catalog in Databricks Free Edition).
-- A Databricks PAT (personal access token) for Exercise 3's API-driven space creation.
+- A Databricks PAT (personal access token) for Exercise 4's API-driven space creation.
 
 For the facilitator:
-- All of the above, plus you'll run `setup/01_create_base_space.py` and `exercises/03_fix_oversized_instructions/create_training_space.py` ahead of time and share the resulting `space_id`s.
+- All of the above, plus you'll run `setup/01_create_base_space.py` and `exercises/04_fix_oversized_instructions/create_training_space.py` ahead of time and share the resulting `space_id`s.
 
 ## Setup (do this once, before the session)
 
@@ -41,10 +40,10 @@ For the facilitator:
    - The `warehouse_id` widget can be left blank: the notebook auto-picks the first Pro/Serverless warehouse in the workspace, or creates a small Serverless Pro one if none exists.
    - Output prints the new `space_id` and a direct URL — share with attendees.
 
-3. **Create the instruction-fix training space for Exercise 3** (separate space whose `text_instructions` is an intentionally oversized single blob)
-   - Open `exercises/03_fix_oversized_instructions/create_training_space.py` as a Databricks notebook and Run All.
+3. **Create the instruction-fix training space for Exercise 4** (separate space whose `text_instructions` is an intentionally oversized single blob)
+   - Open `exercises/04_fix_oversized_instructions/create_training_space.py` as a Databricks notebook and Run All.
    - Same auth + warehouse auto-pick as `01_create_base_space` — no env vars needed.
-   - Output prints the training `space_id` — share with attendees just before Ex 3.
+   - Output prints the training `space_id` — share with attendees just before Ex 4.
 
 ## Repo layout
 

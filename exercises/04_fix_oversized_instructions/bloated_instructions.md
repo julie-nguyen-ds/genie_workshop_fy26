@@ -5,7 +5,7 @@ It's intentionally over-stuffed: glossary, business rules, SQL fragments, table 
 and a redundant FAQ — all crammed into one giant string. Total length is well past
 the per-instruction character cap.
 
-Your job in Exercise 3 is to refactor this into the right asset types.
+Your job in Exercise 4 is to refactor this into the right asset types.
 
 ---
 

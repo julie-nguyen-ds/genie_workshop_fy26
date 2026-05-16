@@ -1,14 +1,14 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC # Create the Instruction-Fix Training Genie Space — Exercise 3
+# MAGIC # Create the Instruction-Fix Training Genie Space — Exercise 4
 # MAGIC
 # MAGIC Creates a Genie space whose `text_instructions` is one oversized blob
 # MAGIC — glossary + table descriptions + SQL fragments + FAQ all crammed
 # MAGIC into a single entry, well past the per-instruction character cap.
-# MAGIC Attendees refactor it into atomic, right-typed assets during Exercise 3.
+# MAGIC Attendees refactor it into atomic, right-typed assets during Exercise 4.
 # MAGIC
 # MAGIC **Facilitator: run this BEFORE the session and share the resulting
-# MAGIC `space_id` with attendees just before Exercise 3.**
+# MAGIC `space_id` with attendees just before Exercise 4.**
 # MAGIC
 # MAGIC **Auth:** picked up from the notebook context — no env vars or PAT.
 # MAGIC
@@ -157,8 +157,8 @@ serialized_space = json.dumps({
 # COMMAND ----------
 
 result = api("POST", "/api/2.0/genie/spaces", {
-    "description": "Thai P&C — Genie Workshop Exercise 3 — instruction-size fix training space",
-    "title": "Thai P&C — Ex 3 Instruction Fix",
+    "description": "Thai P&C — Genie Workshop Exercise 4 — instruction-size fix training space",
+    "title": "Thai P&C — Ex 4 Instruction Fix",
     "parent_path": PARENT_PATH,
     "warehouse_id": warehouse_id,
     "serialized_space": serialized_space,
@@ -171,4 +171,4 @@ print(f"open:     {HOST.rstrip('/')}/genie/rooms/{space_id}")
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC Share the `space_id` printed above with attendees at the start of Exercise 3.
+# MAGIC Share the `space_id` printed above with attendees at the start of Exercise 4.

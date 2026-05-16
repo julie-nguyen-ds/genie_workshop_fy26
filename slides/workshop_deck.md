@@ -39,10 +39,9 @@ The rest of the workshop is learning when to reach for which.
 | 0:00 | Intro (you are here) |
 | 0:10 | Ex 1 — Benchmarks: run + add your own (set the baseline) |
 | 0:25 | Ex 2 — Entity matching & format assistance |
-| 0:37 | Ex 3 — Fix oversized instructions |
-| 1:02 | Ex 4 — Business glossary |
-| 1:27 | Ex 5 — SQL trusted assets |
-| 1:55 | Wrap — re-run benchmark & production checklist |
+| 0:37 | Ex 3 — SQL trusted assets |
+| 1:05 | Ex 4 — Fix oversized instructions |
+| 1:30 | Wrap — re-run benchmark & production checklist |
 
 ---
 
@@ -68,18 +67,13 @@ All in `workspace.insurance_data`. Sample data is already loaded for you.
 
 ---
 
-## (Section break) 8. Exercise 3 — Fix Oversized Instructions
-*See `exercises/03_fix_oversized_instructions/slides.md` for the per-exercise slide block.*
+## (Section break) 8. Exercise 3 — SQL Trusted Assets
+*See `exercises/03_trusted_assets/slides.md` for the per-exercise slide block.*
 
 ---
 
-## (Section break) 9. Exercise 4 — Business Glossary
-*See `exercises/04_glossary_general_instructions/slides.md` for the per-exercise slide block.*
-
----
-
-## (Section break) 9b. Exercise 5 — SQL Trusted Assets
-*See `exercises/05_trusted_assets/slides.md` for the per-exercise slide block.*
+## (Section break) 9. Exercise 4 — Fix Oversized Instructions
+*See `exercises/04_fix_oversized_instructions/slides.md` for the per-exercise slide block.*
 
 ---
 

@@ -1,4 +1,4 @@
-# Exercise 5 — Create SQL Trusted Assets
+# Exercise 3 — Create SQL Trusted Assets
 
 **Time:** 25 minutes
 **Goal:** Make Genie's answer render the **Trusted** badge by adding a SQL function and a parameterized example SQL.

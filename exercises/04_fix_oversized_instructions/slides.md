@@ -1,9 +1,9 @@
-# Exercise 3 — Fix Oversized Instructions (slides)
+# Exercise 4 — Fix Oversized Instructions (slides)
 
 ---
 
 ## Slide 1 — Title
-**Exercise 3: The Instruction Junk Drawer**
+**Exercise 4: The Instruction Junk Drawer**
 *25 minutes — refactor a real-world mess*
 
 ---

@@ -41,7 +41,7 @@ Together: user can say it however they want, Genie writes SQL that matches the d
 - Cheap on 5-table schemas with enums. Expensive on warehouses with high-cardinality columns (millions of distinct IDs).
 - **Per-space decision**: enable it when your filter columns are low-cardinality categoricals.
 
-Entity matching ≠ synonyms. `"paid"` → `"paid"` works; `"motor"` → `"auto"` needs a text instruction (Ex 4) or example SQL (Ex 5).
+Entity matching ≠ synonyms. `"paid"` → `"paid"` works; `"motor"` → `"auto"` needs a text instruction (Ex 4) or example SQL (Ex 3).
 
 ---
 
