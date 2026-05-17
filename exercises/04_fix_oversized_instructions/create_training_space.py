@@ -22,7 +22,7 @@ warehouse_id_override = dbutils.widgets.get("warehouse_id").strip()
 
 CATALOG = "workspace"
 SCHEMA = "insurance_data"
-TABLES = ["customers", "branches", "agents", "policies", "claims"]
+TABLES = ["agents", "branches", "claims", "customers", "policies"]
 
 # COMMAND ----------
 
