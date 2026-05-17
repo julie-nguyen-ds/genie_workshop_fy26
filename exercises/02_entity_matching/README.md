@@ -1,7 +1,7 @@
 # Exercise 2 — Entity Matching & Format Assistance
 
 **Time:** ~12 minutes
-**Goal:** Make Genie match user-spoken values (e.g. `"Paid"`) to actual column values (`paid`, lowercase) without having to write SQL trusted assets first. This fixes the case-mismatch failures you saw in the Exercise 1 benchmark.
+**Goal:** Make Genie match user-spoken values (e.g. `"Paid"`) to actual column values (`paid`, lowercase) without having to write any SQL Query asset first. This fixes the case-mismatch failures you saw in the Exercise 1 benchmark.
 
 ## Why this matters
 

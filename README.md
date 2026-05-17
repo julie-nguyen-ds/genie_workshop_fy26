@@ -12,7 +12,7 @@ Analytics / BI engineers and SAs who will own a Genie space day-to-day. Attendee
 | 0:00 – 0:10 | Intro — what makes a good Genie space (3 asset types) |
 | 0:10 – 0:25 | **Exercise 1** — Benchmarks: run + add your own (sets the baseline; no tuning here) |
 | 0:25 – 0:37 | **Exercise 2** — Entity matching & format assistance (fix the silent-zero) |
-| 0:37 – 1:00 | **Exercise 3** — SQL trusted assets via Example SQL (parametrized + non-parametrized) |
+| 0:37 – 1:00 | **Exercise 3** — Use SQL Query (parametrized + non-parametrized) |
 | 1:00 – 1:25 | **Exercise 4** — Fix oversized instructions |
 | 1:25 – 1:40 | Wrap — re-run the benchmark; checklist for shipping a production Genie space |
 

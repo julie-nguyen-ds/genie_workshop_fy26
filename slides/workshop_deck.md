@@ -14,7 +14,7 @@ Facilitated by Julie Nguyen, Databricks Field Engineering
 
 ## 2. What you'll leave with
 - A working Genie space backed by real P&C data
-- Concrete patterns for **trusted assets**, **benchmarks**, and **instruction hygiene**
+- Concrete patterns for **SQL Query assets**, **benchmarks**, and **instruction hygiene**
 - A short list of mistakes you don't have to make
 - A production-readiness checklist you can take back to your team
 
@@ -28,7 +28,7 @@ A Genie space has four kinds of context:
 | Table descriptions | Tell Genie what each table is |
 | Text instructions | Atomic facts and rules |
 | SQL snippets | Reusable measure formulas |
-| Example SQL | Canonical query shapes (Trusted answers) |
+| Example SQL | Canonical query shapes (pinned, reused verbatim) |
 | SQL functions (UC) | Reusable measures, callable from anywhere |
 
 The rest of the workshop is learning when to reach for which.
@@ -39,7 +39,7 @@ The rest of the workshop is learning when to reach for which.
 | 0:00 | Intro (you are here) |
 | 0:10 | Ex 1 — Benchmarks: run + add your own (set the baseline) |
 | 0:25 | Ex 2 — Entity matching & format assistance |
-| 0:37 | Ex 3 — SQL trusted assets |
+| 0:37 | Ex 3 — Use SQL Query |
 | 1:05 | Ex 4 — Fix oversized instructions |
 | 1:30 | Wrap — re-run benchmark & production checklist |
 
@@ -67,8 +67,8 @@ All in `workspace.insurance_data`. Sample data is already loaded for you.
 
 ---
 
-## (Section break) 8. Exercise 3 — SQL Trusted Assets
-*See `exercises/03_trusted_assets/slides.md` for the per-exercise slide block.*
+## (Section break) 8. Exercise 3 — Use SQL Query
+*See `exercises/03_sql_query/slides.md` for the per-exercise slide block.*
 
 ---
 

@@ -29,7 +29,7 @@ We do **not tune anything** in this exercise. Each next exercise targets a diffe
 | Failure | Fixed in |
 |---|---|
 | `WHERE status = 'Paid'` (uppercase mismatch) → 0 rows | **Ex 2 — Entity matching** |
-| Wrong join path (e.g. `claims.agent_id` doesn't exist); inconsistent answer to "claims by loss type" | **Ex 3 — Trusted assets** |
+| Wrong join path (e.g. `claims.agent_id` doesn't exist); inconsistent answer to "claims by loss type" | **Ex 3 — Use SQL Query** |
 | Bloated `text_instructions` blob → wrong rules win; business term ("in-force") not defined | **Ex 4 — Fix oversized instructions** |
 
 The benchmark = your regression suite. Re-run at end of workshop to see the score climb.

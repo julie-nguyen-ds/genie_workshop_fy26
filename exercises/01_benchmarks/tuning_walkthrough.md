@@ -23,7 +23,7 @@ This is the deep-dive cheat sheet for the live walk-through portion of Exercise 
 After each later exercise, you *could* re-run the benchmark to demonstrate the score improving. We don't budget for this inside the exercises (it adds 2-3 min each), but the very end of the workshop is a great moment to re-run all 6 and show the difference vs the baseline.
 
 - After **Ex 2** (Entity matching ON): #1, #2, #3 should pass — case mismatch fixed.
-- After **Ex 3** (trusted assets added — Example SQL): #5 should pass (via parametrized example SQL pinning the join shape), and the **user-added 6th question** ("total paid claims by loss type for 2025") should also pass since the non-parametrized Example SQL pins its SQL.
+- After **Ex 3** (SQL Query assets added): #5 should pass (via parametrized SQL Query pinning the join shape), and the **user-added 6th question** ("total paid claims by loss type for 2025") should also pass since the non-parametrized SQL Query pins its SQL.
 - After **Ex 4** (instruction refactor — atomic in-force instruction extracted from the bloated blob): #4 should pass.
 
 If a question still fails after the "right" exercise, it's a coaching moment: dig into the generated SQL and figure out the residual gap.
@@ -87,4 +87,4 @@ Quick reference for the diff:
 
 - **"My expected SQL returns different column order — does that fail?"** Yes, the scorer compares result sets including column names. Use consistent aliasing in expected SQL.
 - **"Can I run a subset of the benchmark?"** Yes — re-running individual questions is the normal tuning loop.
-- **"How do I know which lever to reach for?"** Each later exercise covers one: Ex 2 settings → case/format; Ex 3 → query shape (trusted assets); Ex 4 → instruction hygiene + business term definitions.
+- **"How do I know which lever to reach for?"** Each later exercise covers one: Ex 2 settings → case/format; Ex 3 → query shape (SQL Query assets, parametrized + non-parametrized); Ex 4 → instruction hygiene + business term definitions.

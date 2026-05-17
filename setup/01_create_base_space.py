@@ -3,7 +3,7 @@
 # MAGIC # Create the Workshop's Base Genie Space
 # MAGIC
 # MAGIC Creates a deliberately minimal Genie space wired to the 5 tables in
-# MAGIC `workspace.insurance_data`. Attendees add the trusted assets, example
+# MAGIC `workspace.insurance_data`. Attendees add the SQL Query assets, example
 # MAGIC SQL, and additional instructions themselves during Exercises 1, 2, and 4.
 # MAGIC
 # MAGIC **Run order:** Run `00_load_data` first.

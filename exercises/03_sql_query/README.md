@@ -1,15 +1,15 @@
-# Exercise 3 — Create SQL Trusted Assets (Example SQL)
+# Exercise 3 — Use SQL Query (Parametrized and Non-Parametrized)
 
 **Time:** ~22 minutes
-**Goal:** Make Genie's answer render the **Trusted** badge by adding two flavors of **Example SQL** to your space — a *non-parametrized* one for a single specific question, and a *parametrized* one that covers a whole family of questions.
+**Goal:** Pin Genie's answer to a pre-vetted SQL query by adding two flavors of **SQL Query** asset to your space: a *non-parametrized* one for a single specific question, and a *parametrized* one that covers a whole family of questions.
 
-> Why Example SQL and not UC SQL functions? UC functions are also valid trusted assets, but the Genie "Add functions" attach dialog currently rejects `DATE` (and `TIMESTAMP`) parameters with *"Parameter start_date has an unsupported type: date"*. Example SQL has no such limitation — `DATE` parameters work fine in the parametrized form. We'll stay with Example SQL throughout this exercise.
+> Note on UC SQL functions: UC functions are another way to ship pre-vetted SQL, but the Genie "Add functions" attach dialog currently rejects `DATE` (and `TIMESTAMP`) parameters with *"Parameter start_date has an unsupported type: date"*. We stay with SQL Query (Example SQL) throughout this exercise — `DATE` parameters work fine in the parametrized form.
 
 ## Why this matters
 
-By default, Genie writes the SQL itself. That's flexible but it's also where hallucinations and subtle aggregation bugs live. **Trusted assets** are pre-vetted SQL that Genie reuses verbatim — when an answer uses one, it gets a *Trusted* badge, signalling to your business users that the math was reviewed by a human.
+By default, Genie writes the SQL itself. That's flexible but it's also where hallucinations and subtle aggregation bugs live. A **SQL Query asset** is pre-vetted SQL you save on the space — when a user prompt matches it semantically, Genie reuses your SQL verbatim instead of generating new SQL each time. You verify Genie reused it by expanding the generated-SQL panel on the answer card and comparing it against the SQL you saved.
 
-Two flavors of Example SQL today:
+Two flavors today:
 1. **Non-parametrized** — a fixed canonical query for one specific question. Trivial to author; matches one prompt shape only.
 2. **Parametrized** — same idea, but with `:param` placeholders Genie fills in from the user's prompt. Slightly more authoring effort; covers a whole family of questions.
 
@@ -20,9 +20,9 @@ Two flavors of Example SQL today:
 
 ---
 
-## Part A — Non-parametrized Example SQL (~10 min)
+## Part A — Non-parametrized SQL Query (~10 min)
 
-We'll add an Example SQL for the **6th benchmark question you added in Ex 1**: *"Show me total paid claims by loss type for 2025"*. Right now this question fails in your benchmark because Genie generates inconsistent SQL each run. We'll pin it.
+We'll add a SQL Query for the **6th benchmark question you added in Ex 1**: *"Show me total paid claims by loss type for 2025"*. Right now this question fails in your benchmark because Genie generates inconsistent SQL each run. We'll pin it.
 
 ### Step 1. See the problem (~2 min)
 
@@ -38,7 +38,7 @@ Expand the generated SQL. You'll likely see at least one of:
 
 This is exactly the gap Ex 1 told us Ex 3 would close.
 
-### Step 2. Author the non-parametrized Example SQL (~5 min)
+### Step 2. Author the non-parametrized SQL Query (~5 min)
 
 Open `solution.sql` for the verified version, or compose your own. Either way it should match the `ground_truth.sql` we agreed on in Ex 1 Part B Step 2:
 
@@ -56,7 +56,7 @@ ORDER BY claim_count DESC;
 
 Notice this query bakes in every fix from Ex 1's ground truth: `loss_date` (not `settle_date`), `status = 'paid'` filter, stable column names, `_thb` suffix on the currency column.
 
-### Step 3. Attach as Example SQL on the Genie space (~2 min)
+### Step 3. Attach it on the Genie space (~2 min)
 
 1. Open the workshop Genie space.
 2. Right rail → **Example SQL queries** → **Add**.
@@ -77,20 +77,24 @@ Notice this query bakes in every fix from Ex 1's ground truth: `loss_date` (not 
      ```
 5. Save.
 
-### Step 4. Re-ask and compare (~1 min)
+### Step 4. Re-ask and verify (~1 min)
 
 In a fresh thread, ask:
 > *Show me total paid claims by loss type for 2025.*
 
-You should now see the **Trusted** badge and the exact SQL from Step 2. Re-run the Ex 1 benchmark — your 6th question (the one you added) should now pass deterministically.
+Expand the generated-SQL panel. You should see **exactly** the SQL you saved in Step 2 — same WHERE clause, same aliases, same ordering. That's how you confirm Genie reused your query verbatim.
+
+Re-run the Ex 1 benchmark — your 6th question (the one you added) should now pass deterministically.
+
+> Note: Databricks Genie also surfaces a "Trusted" badge on the answer card when a saved query is reused. In some workspaces / UI versions the badge isn't rendered yet — don't rely on it visually. The SQL-diff check above is the definitive test.
 
 ---
 
-## Part B — Parametrized Example SQL (~10 min)
+## Part B — Parametrized SQL Query (~10 min)
 
-The non-parametrized query above only works for 2025. As soon as a user asks about 2024 or *"last quarter"*, Genie has to generate its own SQL again. **Parametrized example SQL** generalizes — same query shape, `:param` placeholders Genie fills in from the user's prompt.
+The non-parametrized query above only works for 2025. As soon as a user asks about 2024 or *"last quarter"*, Genie has to generate its own SQL again. A **parametrized SQL Query** generalizes — same query shape, `:param` placeholders Genie fills in from the user's prompt.
 
-### Step 1. Author the parametrized Example SQL (~5 min)
+### Step 1. Author the parametrized SQL Query (~5 min)
 
 ```sql
 -- Question: Total paid claims by loss type between :start_date and :end_date
@@ -106,7 +110,7 @@ ORDER BY claim_count DESC;
 
 Same body, but the literal date range is replaced with `:start_date` and `:end_date`.
 
-### Step 2. Attach as Example SQL with parameter metadata (~3 min)
+### Step 2. Attach with parameter metadata (~3 min)
 
 1. Right rail → **Example SQL queries** → **Add**.
 2. Paste the SQL.
@@ -142,7 +146,7 @@ Same body, but the literal date range is replaced with `:start_date` and `:end_d
 Ask Genie:
 > *Loss type breakdown of paid claims for Q1 2026.*
 
-Expand the SQL — should be the parametrized template with `:start_date = '2026-01-01'`, `:end_date = '2026-03-31'`. **Trusted** badge appears.
+Expand the SQL — should be the parametrized template with `:start_date = '2026-01-01'`, `:end_date = '2026-03-31'`.
 
 Try one more:
 > *Paid claims by loss type in 2024.*
@@ -169,13 +173,13 @@ Should also use the parametrized version with `'2024-01-01'`, `'2024-12-31'`.
 ---
 
 ## Done when
-- [ ] Non-parametrized Example SQL for "total paid claims by loss type for 2025" exists on the space; the corresponding chat prompt returns a **Trusted** badge.
-- [ ] Parametrized Example SQL with `:start_date` / `:end_date` exists on the space; a non-2025 date question returns a **Trusted** badge with the params correctly filled.
+- [ ] Non-parametrized SQL Query for "total paid claims by loss type for 2025" exists on the space; the corresponding chat prompt returns the **same SQL you saved** (verify by expanding the SQL panel).
+- [ ] Parametrized SQL Query with `:start_date` / `:end_date` exists on the space; a non-2025 date question runs with the params correctly filled in.
 - [ ] Re-run the Ex 1 benchmark — your user-added 6th question (claims by loss type for 2025) now passes.
 - [ ] You can explain when to choose each flavor.
 
 ## If you finish early
-- Add a parametrized example SQL for *"Top N agents by claim count in `:province`"* with `:province` as a STRING parameter. Ask Genie *"who are the top 5 agents by claim count in Phuket?"*.
-- Add a non-parametrized example SQL that pins the join shape from Ex 1 benchmark #5 (top 10 agents by claim count + branch — the question `claims` has no `agent_id` problem). After adding it, re-run that benchmark — should pass.
+- Add a parametrized SQL Query for *"Top N agents by claim count in `:province`"* with `:province` as a STRING parameter. Ask Genie *"who are the top 5 agents by claim count in Phuket?"*.
+- Add a non-parametrized SQL Query that pins the join shape from Ex 1 benchmark #5 (top 10 agents by claim count + branch — the question `claims` has no `agent_id` problem). After adding it, re-run that benchmark — should pass.
 
 See `solution.sql` for paste-ready versions of both flavors.

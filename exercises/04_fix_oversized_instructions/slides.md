@@ -50,7 +50,7 @@ You'll open the training space (oversized single-instruction blob), then:
 ## Slide 5 — Why this works
 - One instruction does **one** job → no competition for Genie's attention.
 - Reusable formulas live where they can be reused → `sql_snippets`.
-- Query shapes live where they show up as Trusted answers → example SQL.
+- Query shapes (canonical joins, top-N patterns) → example SQL queries on the space.
 - Table notes live on the tables → they apply *automatically* to any question about that table.
 
 ---
