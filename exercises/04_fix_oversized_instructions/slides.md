@@ -4,7 +4,7 @@
 
 ## Slide 1 — Title
 **Exercise 4: The Instruction Junk Drawer**
-*25 minutes — refactor a real-world mess*
+*25 minutes — refactor a real-world mess by re-homing each rule, not by chopping the blob*
 
 ---
 
@@ -19,44 +19,47 @@ FAQ: ...
 REMEMBER: don't forget the rules above ...
 ```
 
-3,800 characters. Past the cap. Genie gets *worse*, not better.
+~3,800 characters. Past the cap. Genie gets *worse*, not better.
 
 ---
 
-## Slide 3 — The fix isn't "shorten it"
-The fix is **routing each piece to the right asset type**:
+## Slide 3 — The fix isn't "shorten it" or "split into atoms"
+Genie's `text_instructions` field doesn't get richer when you turn one entry into nine — they all get concatenated into the planner's context the same way. The real lever is **routing each piece to the asset type Genie was designed to read it from**:
 
-| Asset | What goes here |
+| If the rule… | …goes in |
 |---|---|
-| `text_instructions` | Atomic facts (1 fact, 1 entry, <500 chars) |
-| `sql_snippets` | Reusable measures (loss ratio, earned premium) |
-| `example_question_sqls` | Canonical query shapes |
-| Per-table `description` | What each table is and how to join it |
-| Sample questions on the space | "How many X do we have?" |
-| Just delete it | FAQs that don't change query behavior |
+| Applies to **every** query (currency, "today" semantics) | **General instructions** (`text_instructions`) — kept short |
+| Is a reusable **WHERE clause** ("in-force") | **SQL filter** (`sql_snippets.filters`) |
+| Is a reusable **formula** (loss ratio, earned premium) | **SQL expression / measure** (`sql_snippets.measures`) |
+| Is about **one specific table/column** | **Per-table description** |
+| Is a **canonical query shape** | **Example SQL** |
+| Is a sample question / conversational clarification | *Sample questions* panel, not instructions |
 
 ---
 
-## Slide 4 — The refactor (live)
-You'll open the training space (oversized single-instruction blob), then:
-1. Split the monster into **9 atomic `text_instructions`**.
-2. Promote loss ratio + earned premium to **`sql_snippets`**.
-3. Promote canonical joins to **`example_question_sqls`**.
-4. Move table notes to the **table description**.
-5. Delete the FAQ section.
+## Slide 4 — The refactor (live, 5 moves)
+You'll open the training space (oversized single-instruction blob), then make **five** moves — each one points to a different asset type:
+
+1. **General instructions** → keep ONE short paragraph: currency + "today" semantics only.
+2. **SQL filter** → `in_force` filter (status + date window).
+3. **SQL measure** → `loss_ratio` formula.
+4. **Per-table description** → "claims has no agent_id, join through policies" lives on the `claims` table.
+5. **Example SQL** → the canonical top-agents-by-claims join.
+
+FAQs in the blob get sorted: sample question / clarification rule / drop.
 
 ---
 
 ## Slide 5 — Why this works
-- One instruction does **one** job → no competition for Genie's attention.
-- Reusable formulas live where they can be reused → `sql_snippets`.
-- Query shapes (canonical joins, top-N patterns) → example SQL queries on the space.
-- Table notes live on the tables → they apply *automatically* to any question about that table.
+- **General instructions stay short** → no competition for Genie's attention; the LLM actually reads them.
+- **Reusable formulas live where they can be reused** → `sql_snippets`.
+- **Query shapes live as Example SQL** → semantic match on the question, deterministic SQL on the answer (same lesson as Ex 3).
+- **Table-specific notes live on the table** → they apply *automatically* to any question that touches that table.
 
 ---
 
 ## Slide 6 — Takeaway
 > *"My instructions are too long" is rarely the real problem.*
-> *The real problem is that my instructions are doing five jobs and three of them belong elsewhere.*
+> *The real problem is that my instructions are doing five jobs and four of them belong elsewhere.*
 
-Audit your space's instructions before every release. If any entry mentions more than one concept, split it.
+Audit your space's instructions before every release. If anything in `text_instructions` doesn't apply to **every** query, it's in the wrong slot.
