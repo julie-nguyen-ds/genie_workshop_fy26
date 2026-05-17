@@ -49,11 +49,8 @@ For the facilitator:
 
 ```
 data/                            synthetic CSVs + generator
-setup/                           SQL + API to bootstrap the workshop
-exercises/                       one folder per exercise (README + slides + assets)
-slides/workshop_deck.md          consolidated markdown deck
-facilitator_guide.md             timing, pitfalls, env checklist
-CLAUDE.md                        project tracker
+setup/                           setup notebooks (load data, create base Genie space)
+exercises/                       one folder per exercise (README + SQL assets)
 ```
 
 ## License / re-use

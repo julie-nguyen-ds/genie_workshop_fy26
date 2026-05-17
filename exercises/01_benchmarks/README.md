@@ -105,4 +105,3 @@ You should now see **6 questions** in the benchmark. Click **Run benchmark**. Yo
 - Try a question that you suspect will fail because of a case-mismatch issue (e.g. *"how many policies are motor product line?"*) and predict the failure pattern. We'll fix it for real in Exercise 2.
 - Add another benchmark covering an edge case — last-30-days windows, fraud filter on `fraud_flag = true`, percentage calculations.
 
-See `tuning_walkthrough.md` for the facilitator's reference on what each of the 5 pre-loaded questions targets and which later exercise fixes it.
