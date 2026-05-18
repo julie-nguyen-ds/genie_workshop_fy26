@@ -15,13 +15,14 @@
 -- Part A — Non-parametrized Example SQL
 -- ============================================================================
 -- Question (paste into the "Question" field of the Example SQL dialog):
---   Show me total paid claims by loss type for 2025
+--   Show me total paid claims by loss type for 2024
 SELECT
   loss_type,
   COUNT(*) AS claim_count,
-  COALESCE(SUM(CASE WHEN status = 'paid' THEN claim_amount_thb END), 0) AS total_paid_thb
+  COALESCE(SUM(claim_amount_thb), 0) AS total_paid_thb
 FROM workspace.insurance_data.claims
-WHERE loss_date BETWEEN DATE'2025-01-01' AND DATE'2025-12-31'
+WHERE loss_date BETWEEN '2024-01-01' AND '2024-12-31'
+  AND status = 'paid'
 GROUP BY loss_type
 ORDER BY claim_count DESC;
 
@@ -31,14 +32,15 @@ ORDER BY claim_count DESC;
 -- ============================================================================
 -- Question:  Total paid claims by loss type between two dates
 -- Parameters:
---   :start_date — DATE, sample 2025-01-01, "Inclusive start of the loss date window. ISO format YYYY-MM-DD."
---   :end_date   — DATE, sample 2025-12-31, "Inclusive end of the loss date window. ISO format YYYY-MM-DD."
+--   :start_date — DATE, sample 2024-01-01, "Inclusive start of the loss date window. ISO format YYYY-MM-DD."
+--   :end_date   — DATE, sample 2024-12-31, "Inclusive end of the loss date window. ISO format YYYY-MM-DD."
 SELECT
   loss_type,
   COUNT(*) AS claim_count,
-  COALESCE(SUM(CASE WHEN status = 'paid' THEN claim_amount_thb END), 0) AS total_paid_thb
+  COALESCE(SUM(claim_amount_thb), 0) AS total_paid_thb
 FROM workspace.insurance_data.claims
 WHERE loss_date BETWEEN :start_date AND :end_date
+  AND status = 'paid'
 GROUP BY loss_type
 ORDER BY claim_count DESC;
 

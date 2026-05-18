@@ -22,13 +22,13 @@ Two flavors today:
 
 ## Part A — Non-parametrized SQL Query (~10 min)
 
-We'll add a SQL Query for the **6th benchmark question you added in Ex 1**: *"Show me total paid claims by loss type for 2025"*. Right now this question fails in your benchmark because Genie generates inconsistent SQL each run. We'll pin it.
+We'll add a SQL Query for the **6th benchmark question you added in Ex 1**: *"Show me total paid claims by loss type for 2024"*. Right now this question fails in your benchmark because Genie generates inconsistent SQL each run. We'll pin it.
 
 ### Step 1. See the problem (~2 min)
 
 In a fresh chat thread, ask:
 
-> *Show me total paid claims by loss type for 2025.*
+> *Show me total paid claims by loss type for 2024.*
 
 Expand the generated SQL. You'll likely see at least one of:
 - `WHERE settle_date BETWEEN ...` instead of `loss_date`
@@ -43,18 +43,19 @@ This is exactly the gap Ex 1 told us Ex 3 would close.
 Open `solution.sql` for the verified version, or compose your own. Either way it should match the `ground_truth.sql` we agreed on in Ex 1 Part B Step 2:
 
 ```sql
--- Question: Show me total paid claims by loss type for 2025
+-- Question: Show me total paid claims by loss type for 2024
 SELECT
   loss_type,
   COUNT(*) AS claim_count,
-  COALESCE(SUM(CASE WHEN status = 'paid' THEN claim_amount_thb END), 0) AS total_paid_thb
+  COALESCE(SUM(claim_amount_thb), 0) AS total_paid_thb
 FROM workspace.insurance_data.claims
-WHERE loss_date BETWEEN DATE'2025-01-01' AND DATE'2025-12-31'
+WHERE loss_date BETWEEN '2024-01-01' AND '2024-12-31'
+  AND status = 'paid'
 GROUP BY loss_type
 ORDER BY claim_count DESC;
 ```
 
-Notice this query bakes in every fix from Ex 1's ground truth: `loss_date` (not `settle_date`), `status = 'paid'` filter, stable column names, `_thb` suffix on the currency column.
+Notice this query bakes in every fix from Ex 1's ground truth: `loss_date` (not `settle_date`) for the date window, an explicit `status = 'paid'` filter in the WHERE clause (so `claim_count` and `total_paid_thb` both describe paid claims only), stable column names, and `_thb` suffix on the currency column.
 
 ### Step 3. Attach it on the Genie space (~2 min)
 
@@ -62,17 +63,17 @@ Notice this query bakes in every fix from Ex 1's ground truth: `loss_date` (not 
 2. Right rail → **Example SQL queries** → **Add**.
 3. Paste the SQL above.
 4. Fill in the metadata:
-   - **Question:** *Show me total paid claims by loss type for 2025*
-   - **Usage guidance:** list paraphrases that should hit this exact query (it only handles 2025 — don't widen the net beyond that year):
+   - **Question:** *Show me total paid claims by loss type for 2024*
+   - **Usage guidance:** list paraphrases that should hit this exact query (it only handles 2024 — don't widen the net beyond that year):
      ```
-     Use this exact query for any 2025-scoped question about paid claims grouped
+     Use this exact query for any 2024-scoped question about paid claims grouped
      by loss_type. Phrasings that should match:
-       • "Show me total paid claims by loss type for 2025"
-       • "Paid claims by loss_type in 2025"
-       • "Breakdown of paid claims by type of loss for 2025"
-       • "Loss type distribution of paid claims for 2025"
+       • "Show me total paid claims by loss type for 2024"
+       • "Paid claims by loss_type in 2024"
+       • "Breakdown of paid claims by type of loss for 2024"
+       • "Loss type distribution of paid claims for 2024"
 
-     Do NOT use this query for any year other than 2025 — use the parametrized
+     Do NOT use this query for any year other than 2024 — use the parametrized
      version below instead.
      ```
 5. Save.
@@ -80,7 +81,7 @@ Notice this query bakes in every fix from Ex 1's ground truth: `loss_date` (not 
 ### Step 4. Re-ask and verify (~1 min)
 
 In a fresh thread, ask:
-> *Show me total paid claims by loss type for 2025.*
+> *Show me total paid claims by loss type for 2024.*
 
 Expand the generated-SQL panel. You should see **exactly** the SQL you saved in Step 2 — same WHERE clause, same aliases, same ordering. That's how you confirm Genie reused your query verbatim.
 
@@ -92,7 +93,7 @@ Re-run the Ex 1 benchmark — your 6th question (the one you added) should now p
 
 ## Part B — Parametrized SQL Query (~10 min)
 
-The non-parametrized query above only works for 2025. As soon as a user asks about 2024 or *"last quarter"*, Genie has to generate its own SQL again. A **parametrized SQL Query** generalizes — same query shape, `:param` placeholders Genie fills in from the user's prompt.
+The non-parametrized query above only works for 2024. As soon as a user asks about 2023 or *"last quarter"*, Genie has to generate its own SQL again. A **parametrized SQL Query** generalizes — same query shape, `:param` placeholders Genie fills in from the user's prompt.
 
 ### Step 1. Author the parametrized SQL Query (~5 min)
 
@@ -101,9 +102,10 @@ The non-parametrized query above only works for 2025. As soon as a user asks abo
 SELECT
   loss_type,
   COUNT(*) AS claim_count,
-  COALESCE(SUM(CASE WHEN status = 'paid' THEN claim_amount_thb END), 0) AS total_paid_thb
+  COALESCE(SUM(claim_amount_thb), 0) AS total_paid_thb
 FROM workspace.insurance_data.claims
 WHERE loss_date BETWEEN :start_date AND :end_date
+  AND status = 'paid'
 GROUP BY loss_type
 ORDER BY claim_count DESC;
 ```
@@ -117,20 +119,20 @@ Same body, but the literal date range is replaced with `:start_date` and `:end_d
 3. Fill in the metadata:
    - **Question:** *Total paid claims by loss type between two dates*
    - **Parameters:**
-     - `:start_date` — type **DATE**, sample value `2025-01-01`, description: *"Inclusive start of the loss date window. ISO format YYYY-MM-DD."*
-     - `:end_date` — type **DATE**, sample value `2025-12-31`, description: *"Inclusive end of the loss date window. ISO format YYYY-MM-DD."*
+     - `:start_date` — type **DATE**, sample value `2024-01-01`, description: *"Inclusive start of the loss date window. ISO format YYYY-MM-DD."*
+     - `:end_date` — type **DATE**, sample value `2024-12-31`, description: *"Inclusive end of the loss date window. ISO format YYYY-MM-DD."*
    - **Usage guidance:**
      ```
      Use this query whenever the user asks for paid claims grouped by loss_type
-     over a date range OTHER than 2025 (the fixed 2025 version above handles that
+     over a date range OTHER than 2024 (the fixed 2024 version above handles that
      specific year). Phrasings that should match:
-       • "Paid claims by loss type for 2024"
+       • "Paid claims by loss type for 2023"
        • "Loss type breakdown of paid claims in Q1 2026"
        • "Paid claims by loss_type last month"
-       • "What did we pay out by loss type from March to August 2024?"
+       • "What did we pay out by loss type from March to August 2023?"
 
      Map the user's time window to :start_date and :end_date:
-       • "2024"           → '2024-01-01', '2024-12-31'
+       • "2023"           → '2023-01-01', '2023-12-31'
        • "Q1 2026"        → '2026-01-01', '2026-03-31'
        • "January 2025"   → '2025-01-01', '2025-01-31'
        • "last month"     → first and last day of the previous calendar month
@@ -149,9 +151,9 @@ Ask Genie:
 Expand the SQL — should be the parametrized template with `:start_date = '2026-01-01'`, `:end_date = '2026-03-31'`.
 
 Try one more:
-> *Paid claims by loss type in 2024.*
+> *Paid claims by loss type in 2023.*
 
-Should also use the parametrized version with `'2024-01-01'`, `'2024-12-31'`.
+Should also use the parametrized version with `'2023-01-01'`, `'2023-12-31'`.
 
 ---
 
@@ -173,9 +175,9 @@ Should also use the parametrized version with `'2024-01-01'`, `'2024-12-31'`.
 ---
 
 ## Done when
-- [ ] Non-parametrized SQL Query for "total paid claims by loss type for 2025" exists on the space; the corresponding chat prompt returns the **same SQL you saved** (verify by expanding the SQL panel).
-- [ ] Parametrized SQL Query with `:start_date` / `:end_date` exists on the space; a non-2025 date question runs with the params correctly filled in.
-- [ ] Re-run the Ex 1 benchmark — your user-added 6th question (claims by loss type for 2025) now passes.
+- [ ] Non-parametrized SQL Query for "total paid claims by loss type for 2024" exists on the space; the corresponding chat prompt returns the **same SQL you saved** (verify by expanding the SQL panel).
+- [ ] Parametrized SQL Query with `:start_date` / `:end_date` exists on the space; a non-2024 date question runs with the params correctly filled in.
+- [ ] Re-run the Ex 1 benchmark — your user-added 6th question (claims by loss type for 2024) now passes.
 - [ ] You can explain when to choose each flavor.
 
 ## If you finish early

@@ -47,9 +47,9 @@ This is the part that mirrors what you'll do in your own production spaces: **a 
 
 ### The question you'll add
 
-> *Show me total paid claims by loss type for 2025.*
+> *Show me total paid claims by loss type for 2024.*
 
-We chose this one on purpose: it's the natural-language counterpart for the **SQL Query** asset you'll author in Exercise 3 (both a non-parametrized "for 2025" version and a parametrized `:start_date / :end_date` version). Right now Genie has no saved query for it, so it'll likely get the SQL subtly wrong. Once Ex 3 attaches the SQL Query, re-running this benchmark should pass — that's the regression-test loop closing.
+We chose this one on purpose: it's the natural-language counterpart for the **SQL Query** asset you'll author in Exercise 3 (both a non-parametrized "for 2024" version and a parametrized `:start_date / :end_date` version). Right now Genie has no saved query for it, so it'll likely get the SQL subtly wrong. Once Ex 3 attaches the SQL Query, re-running this benchmark should pass — that's the regression-test loop closing.
 
 ### Step 1. Ask Genie to generate the SQL (~1 min)
 
@@ -63,10 +63,10 @@ This is the critical step. Open a SQL editor tab (or the Databricks SQL Editor),
 
 The **ground truth** for this question lives in [`ground_truth.sql`](ground_truth.sql) — open it side-by-side with Genie's output. Diff the two and walk through the five things Genie typically gets wrong on this question:
 
-1. **Date column** — Genie usually filters on `settle_date`. The ground truth filters on `loss_date` (claims that *occurred* in 2025, not ones *settled* in 2025).
+1. **Date column** — Genie usually filters on `settle_date`. The ground truth filters on `loss_date` (claims that *occurred* in 2024, not ones *settled* in 2024).
 2. **Paid filter** — Genie doesn't filter for paid claims. The ground truth filters `status = 'paid'`, so unpaid/denied/pending claims don't inflate the total.
-3. **Missing `claim_count`** — Genie typically only returns `total_paid_claims_thb`. The ground truth returns both `claim_count` and `total_paid_thb` per loss type.
-4. **No `COALESCE` + `CASE`** — Genie aggregates with a plain `SUM`. The ground truth wraps the paid-only sum in `CASE WHEN status = 'paid' THEN claim_amount_thb END` and `COALESCE(..., 0)` so loss types with zero paid claims still show a row with `0` instead of `NULL`.
+3. **Missing `claim_count`** — Genie typically only returns `total_paid_claims_thb`. The ground truth returns both `claim_count` and `total_paid_thb` per loss type (both describing paid claims, since the `status = 'paid'` filter lives in the WHERE clause).
+4. **No `COALESCE`** — Genie aggregates with a plain `SUM`. The ground truth wraps it in `COALESCE(SUM(claim_amount_thb), 0)` defensively.
 5. **Order** — Genie orders by `total_paid_claims_thb DESC`. The ground truth orders by `claim_count DESC` (most-frequent loss types first, regardless of THB magnitude).
 
 Also sanity-check the casing (`'paid'` lowercase vs `'Paid'`) and eyeball the per-loss_type numbers — if "fire" comes out to 23 THB or 10^12 THB, something is broken.
@@ -78,13 +78,13 @@ If Genie's SQL differs from the ground truth, **use the ground truth** as your e
 1. Go back to the **Benchmark** tab.
 2. **Add question**.
 3. Paste:
-   - **Question**: *Show me total paid claims by loss type for 2025.*
+   - **Question**: *Show me total paid claims by loss type for 2024.*
    - **Expected SQL**: the verified SQL from Step 2
 4. Save.
 
 ### Step 4. Re-run the benchmark (~1 min)
 
-You should now see **6 questions** in the benchmark. Click **Run benchmark**. Your new question may pass or fail depending on whether Genie regenerates the same SQL you stored — and that's exactly the gap that Exercise 3 will close by pinning the SQL via Example SQL (both a hardcoded-2025 version and a parametrized variant).
+You should now see **6 questions** in the benchmark. Click **Run benchmark**. Your new question may pass or fail depending on whether Genie regenerates the same SQL you stored — and that's exactly the gap that Exercise 3 will close by pinning the SQL via Example SQL (both a hardcoded-2024 version and a parametrized variant).
 
 ---
 
@@ -98,7 +98,7 @@ You should now see **6 questions** in the benchmark. Click **Run benchmark**. Yo
 
 ## Done when
 - [ ] Pre-loaded 5-question benchmark ran; you noted the baseline pass count and what kinds of failures appeared.
-- [ ] You added the *"Show me total paid claims by loss type for 2025"* question to the benchmark, with verified expected SQL.
+- [ ] You added the *"Show me total paid claims by loss type for 2024"* question to the benchmark, with verified expected SQL.
 - [ ] You can explain why human SQL verification is non-negotiable.
 
 ## If you finish early
